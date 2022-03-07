@@ -39,3 +39,23 @@ def init_db():
     """ Initializes the SQLAlchemy app """
     global app
     YourResourceModel.init_db(app)
+
+# UPDATE AN EXISTING CUSTOMER
+######################################################################
+@app.route("/customers/<int:customer_id>", methods=["PUT"])
+defupdate_customer(customer_id):
+"""Update a Customer
+
+    This endpoint will update a Customer based the body that is posted
+    """
+app.logger.info("Request to update customer with id: %s", customer_id)
+check_content_type("application/json")
+customer=customer.find(customer_id)
+ifnotcustomer:
+raiseNotFound("Customer with id '{}' was not found.".format(customer_id))
+customer.deserialize(request.get_json())
+customer.id=customer_id
+customer.update()
+
+app.logger.info("Customerwith ID [%s] updated.", customer.id)
+returnmake_response(jsonify(customer.serialize()), status.HTTP_200_OK)
