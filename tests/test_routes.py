@@ -67,6 +67,7 @@ class TestYourResourceServer(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+
   # Test update the customer
     def test_update_customer(self):
         """Update an existing customer"""
@@ -89,3 +90,20 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         updated_customer = resp.get_json()
         self.assertEqual(updated_customer["category"], "unknown")
+
+    def test_get_customer(self):
+        """Get a single customer"""
+        # get the id of a customer
+        test_customer = self._create_customers(1)[0]
+        resp = self.app.get(
+            "/customers/{}".format(test_customer.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(data["name"], test_customer.name)
+
+    def test_get_customer_not_found(self):
+        """Get a customer thats not found"""
+        resp = self.app.get("/customers/0")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
