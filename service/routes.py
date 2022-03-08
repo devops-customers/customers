@@ -36,7 +36,7 @@ def index():
 ######################################################################
 # RETRIEVE A CUSTOMER
 ######################################################################
-@app.route("/pets/<int:pet_id>", methods=["GET"])
+@app.route("/customers/<int:customer_id>", methods=["GET"])
 def get_customers(customer_id):
     """
     Retrieve a single Customer
@@ -65,30 +65,14 @@ def list_customers():
 #-----------------------------------------------------------
 # Create customer
 #-----------------------------------------------------------
-@app.route("", methods=[""])
+@app.route("/", methods=[""])
 def create_customer(name):
-    return ""
-
-
-#-----------------------------------------------------------
-# Read customer
-#-----------------------------------------------------------
-@app.route("", methods=[""])
-def read_customer(name):
-    return ""
-    
-
-#-----------------------------------------------------------
-# Update customer
-#-----------------------------------------------------------
-@app.route("", methods=[""])
-def update_customer(name):
     return ""
 
 #-----------------------------------------------------------
 # Delete customer
 #-----------------------------------------------------------
-@app.route("", methods=[""])
+@app.route("/", methods=[""])
 def delete_customer(name):
     return ""
 
