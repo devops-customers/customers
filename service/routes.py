@@ -32,6 +32,22 @@ def index():
         url=url_for("list_customers", _external=True),
     )
 
+######################################################################
+# RETRIEVE A CUSTOMER
+######################################################################
+@app.route("/pets/<int:pet_id>", methods=["GET"])
+def get_customers(customer_id):
+    """
+    Retrieve a single Customer
+    This endpoint will return a Customer based on it's id
+    """
+    app.logger.info("Request for customer with id: %s", customer_id)
+    customer = customer.find(customer_id)
+    if not customer:
+        raise NotFound("customer with id '{}' was not found.".format(customer_id))
+
+    app.logger.info("Returning customer: %s", customer.name)
+    return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
 
 ############################################################
 #                 R E S T   A P I
