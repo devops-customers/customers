@@ -13,7 +13,7 @@ from . import status  # HTTP Status Codes
 # For this example we'll use SQLAlchemy, a popular ORM that supports a
 # variety of backends including SQLite, MySQL, and PostgreSQL
 from flask_sqlalchemy import SQLAlchemy
-from service.models import YourResourceModel, DataValidationError
+from service.models import Customer, DataValidationError
 
 # Import Flask application
 from . import app
@@ -29,6 +29,22 @@ def index():
         status.HTTP_200_OK,
     )
 
+######################################################################
+# RETRIEVE A CUSTOMER
+######################################################################
+@app.route("/pets/<int:pet_id>", methods=["GET"])
+def get_customers(customer_id):
+    """
+    Retrieve a single Customer
+    This endpoint will return a Customer based on it's id
+    """
+    app.logger.info("Request for customer with id: %s", customer_id)
+    customer = customer.find(customer_id)
+    if not customer:
+        raise NotFound("customer with id '{}' was not found.".format(customer_id))
+
+    app.logger.info("Returning customer: %s", customer.name)
+    return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
