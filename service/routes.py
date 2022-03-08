@@ -23,11 +23,57 @@ from . import app
 ######################################################################
 @app.route("/")
 def index():
-    """ Root URL response """
-    return (
-        "Reminder: return some useful information in json format about the service here",
-        status.HTTP_200_OK,
+    """Returns information about the service"""
+    app.logger.info("Request for Base URL")
+    return jsonify(
+        status=HTTP_200_OK,
+        message="Customer Service",
+        version="1.0.0",
+        url=url_for("list_customers", _external=True),
     )
+
+
+############################################################
+#                 R E S T   A P I
+############################################################
+
+
+#-----------------------------------------------------------
+# List customers
+#-----------------------------------------------------------
+@app.route("/customers", methods=[""])
+def list_customers():
+    return ""
+
+#-----------------------------------------------------------
+# Create customer
+#-----------------------------------------------------------
+@app.route("", methods=[""])
+def create_customer(name):
+    return ""
+
+
+#-----------------------------------------------------------
+# Read customer
+#-----------------------------------------------------------
+@app.route("", methods=[""])
+def read_customer(name):
+    return ""
+    
+
+#-----------------------------------------------------------
+# Update customer
+#-----------------------------------------------------------
+@app.route("", methods=[""])
+def update_customer(name):
+    return ""
+
+#-----------------------------------------------------------
+# Delete customer
+#-----------------------------------------------------------
+@app.route("", methods=[""])
+def delete_customer(name):
+    return ""
 
 
 ######################################################################
