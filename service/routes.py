@@ -22,6 +22,8 @@ from . import app
 ######################################################################
 # GET INDEX
 ######################################################################
+
+
 @app.route("/")
 def index():
     """Returns information about the service"""
@@ -36,6 +38,8 @@ def index():
 ######################################################################
 # RETRIEVE A CUSTOMER
 ######################################################################
+
+
 @app.route("/customers/<int:customer_id>", methods=["GET"])
 def get_customers(customer_id):
     """
@@ -45,7 +49,8 @@ def get_customers(customer_id):
     app.logger.info("Request for customer with id: %s", customer_id)
     customer = customer.find(customer_id)
     if not customer:
-        raise NotFound("customer with id '{}' was not found.".format(customer_id))
+        raise NotFound(
+            "customer with id '{}' was not found.".format(customer_id))
 
     app.logger.info("Returning customer: %s", customer.name)
     return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
@@ -55,23 +60,42 @@ def get_customers(customer_id):
 ############################################################
 
 
-#-----------------------------------------------------------
+# -----------------------------------------------------------
 # List customers
-#-----------------------------------------------------------
+# -----------------------------------------------------------
 @app.route("/customers", methods=[""])
 def list_customers():
     return ""
 
-#-----------------------------------------------------------
+# -----------------------------------------------------------
 # Create customer
-#-----------------------------------------------------------
-@app.route("/", methods=[""])
-def create_customer(name):
-    return ""
+# -----------------------------------------------------------
 
-#-----------------------------------------------------------
+
+@app.route("/customers", methods=["POST"])
+def create_customer():
+    """
+    Creates a Customer Account
+    This endpoint will create a Customer Account based on the data in the body that is posted
+    """
+    app.logger.info("Request to create a Customer Account")
+    check_content_type("application/json")
+    customer = Customer()
+    customer.deserialize(request.get_json())
+    customer.create()
+    message = customer.serialize()
+    location_url = url_for(
+        "get_customer", customer_id=customer.id, _external=True)
+    app.logger.info("Customer with ID [%s] created", customer.id)
+    return make_response(
+        jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
+    )
+
+# -----------------------------------------------------------
 # Delete customer
-#-----------------------------------------------------------
+# -----------------------------------------------------------
+
+
 @app.route("/", methods=[""])
 def delete_customer(name):
     return ""
@@ -89,6 +113,8 @@ def init_db():
 
 # UPDATE AN EXISTING CUSTOMER
 ######################################################################
+
+
 @app.route("/customers/<int:customer_id>", methods=["PUT"])
 def update_customer(customer_id):
     """Update a Customer
@@ -97,11 +123,12 @@ def update_customer(customer_id):
     """
     app.logger.info("Request to update customer with id: %s", customer_id)
     check_content_type("application/json")
-    customer=customer.find(customer_id)
+    customer = customer.find(customer_id)
     if not customer:
-        raise NotFound("Customer with id '{}' was not found.".format(customer_id))
+        raise NotFound(
+            "Customer with id '{}' was not found.".format(customer_id))
     customer.deserialize(request.get_json())
-    customer.id=customer_id
+    customer.id = customer_id
     customer.update()
 
     app.logger.info("Customerwith ID [%s] updated.", customer.id)
@@ -123,4 +150,3 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         "Content-Type must be {}".format(media_type),
     )
-

@@ -37,6 +37,8 @@ CONTENT_TYPE_JSON = "application/json"
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestYourResourceServer(TestCase):
     """ REST API Server Tests """
 
@@ -67,6 +69,59 @@ class TestYourResourceServer(TestCase):
         resp = self.app.get("/")
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
+    # Test create customer account
+    def test_create_a_customer(self):
+        """Create a new Customer Account"""
+        customer = CustomerFactory()
+        logging.debug(customer)
+        resp = self.app.post(
+            BASE_URL, json=customer.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Make sure location header is set
+        location = resp.headers.get("Location", None)
+        self.assertIsNotNone(location)
+
+        # Check the data is correct
+        new_customer = resp.get_json()
+        self.assertEqual(
+            new_customer["first name"], customer.first_name,
+            "First name does not match"
+        )
+        self.assertEqual(
+            new_customer["last name"], customer.last_name, "Last name does not match"
+        )
+        self.assertEqual(
+            new_customer["email"], customer.email, "Email does not match"
+        )
+        self.assertEqual(
+            new_customer["phone number"], customer.phone_number, "Phone number does not match"
+        )
+
+        # Check that the location header was correct
+        resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_customer = resp.get_json()
+        self.assertEqual(
+            new_customer["first name"], customer.first_name,
+            "First name does not match"
+        )
+        self.assertEqual(
+            new_customer["last name"], customer.last_name, "Last name does not match"
+        )
+        self.assertEqual(
+            new_customer["email"], customer.email, "Email does not match"
+        )
+        self.assertEqual(
+            new_customer["phone number"], customer.phone_number, "Phone number does not match"
+        )
+
+    # Test create customer account with missing data
+    def test_create_a_customer_no_data(self):
+        """Create a Customer with missing data"""
+        resp = self.app.post(BASE_URL, json={}, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
   # Test update the customer
     def test_update_customer(self):
@@ -106,4 +161,3 @@ class TestYourResourceServer(TestCase):
         """Get a customer thats not found"""
         resp = self.app.get("/customers/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
-
