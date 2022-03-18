@@ -86,17 +86,17 @@ class TestYourResourceServer(TestCase):
         # Check the data is correct
         new_customer = resp.get_json()
         self.assertEqual(
-            new_customer["first name"], customer.first_name,
+            new_customer["first_name"], customer.first_name,
             "First name does not match"
         )
         self.assertEqual(
-            new_customer["last name"], customer.last_name, "Last name does not match"
+            new_customer["last_name"], customer.last_name, "Last name does not match"
         )
         self.assertEqual(
             new_customer["email"], customer.email, "Email does not match"
         )
         self.assertEqual(
-            new_customer["phone number"], customer.phone_number, "Phone number does not match"
+            new_customer["phone_number"], customer.phone_number, "Phone number does not match"
         )
 
         # Check that the location header was correct
@@ -104,17 +104,17 @@ class TestYourResourceServer(TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_customer = resp.get_json()
         self.assertEqual(
-            new_customer["first name"], customer.first_name,
+            new_customer["first_name"], customer.first_name,
             "First name does not match"
         )
         self.assertEqual(
-            new_customer["last name"], customer.last_name, "Last name does not match"
+            new_customer["last_name"], customer.last_name, "Last name does not match"
         )
         self.assertEqual(
             new_customer["email"], customer.email, "Email does not match"
         )
         self.assertEqual(
-            new_customer["phone number"], customer.phone_number, "Phone number does not match"
+            new_customer["phone_number"], customer.phone_number, "Phone number does not match"
         )
 
     # Test create customer account with missing data

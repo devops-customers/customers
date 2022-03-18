@@ -28,11 +28,13 @@ from . import app
 def index():
     """Returns information about the service"""
     app.logger.info("Request for Base URL")
-    return jsonify(
-        status=HTTP_200_OK,
-        message="Customer Service",
-        version="1.0.0",
-        url=url_for("list_customers", _external=True),
+    return (
+        jsonify(
+            message="Customer Service",
+            version="1.0.0",
+            url=url_for("list_customers", _external=True),
+        ),
+        status.HTTP_200_OK,
     )
 
 ######################################################################
@@ -47,7 +49,7 @@ def get_customers(customer_id):
     This endpoint will return a Customer based on it's id
     """
     app.logger.info("Request for customer with id: %s", customer_id)
-    customer = customer.find(customer_id)
+    customer = Customer.find(customer_id)
     if not customer:
         raise NotFound(
             "customer with id '{}' was not found.".format(customer_id))
@@ -85,7 +87,7 @@ def create_customer():
     customer.create()
     message = customer.serialize()
     location_url = url_for(
-        "get_customer", customer_id=customer.id, _external=True)
+        "get_customers", customer_id=customer.id, _external=True)
     app.logger.info("Customer with ID [%s] created", customer.id)
     return make_response(
         jsonify(message), status.HTTP_201_CREATED, {"Location": location_url}
@@ -123,7 +125,7 @@ def update_customer(customer_id):
     """
     app.logger.info("Request to update customer with id: %s", customer_id)
     check_content_type("application/json")
-    customer = customer.find(customer_id)
+    customer = Customer.find(customer_id)
     if not customer:
         raise NotFound(
             "Customer with id '{}' was not found.".format(customer_id))
