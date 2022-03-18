@@ -44,21 +44,45 @@ class TestYourResourceServer(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        app.config["TESTING"] = True
+        app.config["DEBUG"] = False
+        # Set up the test database
+        app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
+        app.logger.setLevel(logging.CRITICAL)
+        init_db(app)
         """ This runs once before the entire test suite """
         pass
 
     @classmethod
     def tearDownClass(cls):
-        """ This runs once after the entire test suite """
-        pass
+        """Run once after all tests"""
+        db.session.close()
 
     def setUp(self):
-        """ This runs before each test """
+        """Runs before each test"""
+        db.drop_all()  # clean up the last tests
+        db.create_all()  # create new tables
         self.app = app.test_client()
 
     def tearDown(self):
-        """ This runs after each test """
-        pass
+        db.session.remove()
+        db.drop_all()
+
+    def create_customers(self, count):
+        """Factory method to create customers in bulk"""
+        customers = []
+        for _ in range(count):
+            test_customer = CustomerFactory()
+            resp = self.app.post(
+                BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+            )
+            self.assertEqual(
+                resp.status_code, status.HTTP_201_CREATED, "Could not create test customer"
+            )
+            new_customer = resp.get_json()
+            test_customer.id = new_customer["id"]
+            customers.append(test_customer)
+        return customers
 
     ######################################################################
     #  P L A C E   T E S T   C A S E S   H E R E
@@ -149,13 +173,13 @@ class TestYourResourceServer(TestCase):
     def test_get_customer(self):
         """Get a single customer"""
         # get the id of a customer
-        test_customer = self._create_customers(1)[0]
+        test_customer = self.create_customers(1)[0]
         resp = self.app.get(
             "/customers/{}".format(test_customer.id), content_type=CONTENT_TYPE_JSON
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = resp.get_json()
-        self.assertEqual(data["name"], test_customer.name)
+        self.assertEqual(data["first_name"], test_customer.first_name)
 
     def test_get_customer_not_found(self):
         """Get a customer thats not found"""

@@ -45,16 +45,16 @@ def index():
 @app.route("/customers/<int:customer_id>", methods=["GET"])
 def get_customers(customer_id):
     """
-    Retrieve a single Customer
-    This endpoint will return a Customer based on it's id
-    """
+ #   Retrieve a single Customer
+ #   This endpoint will return a Customer based on it's id
+ #   """
     app.logger.info("Request for customer with id: %s", customer_id)
     customer = Customer.find(customer_id)
     if not customer:
         raise NotFound(
             "customer with id '{}' was not found.".format(customer_id))
 
-    app.logger.info("Returning customer: %s", customer.name)
+    app.logger.info("Returning customer: %s", customer.first_name)
     return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
 
 ############################################################
@@ -128,7 +128,7 @@ def update_customer(customer_id):
     customer = Customer.find(customer_id)
     if not customer:
         raise NotFound(
-            "Customer with id '{}' was not found.".format(customer_id))
+           "Customer with id '{}' was not found.".format(customer_id))
     customer.deserialize(request.get_json())
     customer.id = customer_id
     customer.update()
