@@ -189,3 +189,17 @@ class TestCustomerServer(unittest.TestCase):
         for customer in data:
             self.assertEqual(customer["email"], test_email)
 
+    def test_query_customer_list_by_last_name(self):
+        """Query Customers by last_name"""
+        customers = self.create_customers(10)
+        test_last_name = customers[0].last_name
+        last_name_customers = [customer for customer in customers if customer.last_name == test_last_name]
+        resp = self.app.get(
+            BASE_URL, query_string="last_name={}".format(quote_plus(test_last_name))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(last_name_customers))
+        # check the data just to be sure
+        for customer in data:
+            self.assertEqual(customer["last_name"], test_last_name)
