@@ -212,3 +212,17 @@ class Customer(db.Model):
         """
         logger.info("Processing first name query for %s ...", first_name)
         return cls.query.filter(cls.first_name == first_name)
+
+    @classmethod
+    def find_by_email(cls, email: str) -> list:
+        """ Returns all Customers with the given email
+
+        :param first_name: the first name of the Customers you want to match
+        :type first_name: str
+
+        :return: a collection of Customers with that first name
+        :rtype: list
+
+        """
+        logger.info("Processing email query for %s ...", email)
+        return cls.query.filter(cls.email == email)

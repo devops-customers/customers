@@ -38,7 +38,21 @@ def index():
 ######################################################################
 @app.route("/customers", methods=["GET"])
 def list_customers():
-    return ""
+    """Returns all of the Customers"""
+    app.logger.info("Request for pet list")
+    customers = []
+    email = request.args.get("email")
+    last_name = request.args.get("Last_name")
+    if email:
+        customers = Customer.find_by_email(email)
+    elif last_name:
+        customers = Customer.find_by_last_name(last_name)
+    else:
+        customers = Customer.all()
+
+    results = [customer.serialize() for customer in customers]
+    app.logger.info("Returning %d customers", len(results))
+    return make_response(jsonify(results), status.HTTP_200_OK)
 
 
 ######################################################################
