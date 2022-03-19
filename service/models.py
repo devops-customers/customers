@@ -47,6 +47,7 @@ def init_db(app):
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
 
+
 class Customer(db.Model):
     """ 
     Class that represents a Customer
@@ -59,7 +60,8 @@ class Customer(db.Model):
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
     email = db.Column(db.String(64))
-    phone_number = db.Column(db.String(32), nullable=True) # phone # is optional
+    phone_number = db.Column(
+        db.String(32), nullable=True)  # phone # is optional
 
     ##################################################
     # INSTANCE METHODS
@@ -73,7 +75,7 @@ class Customer(db.Model):
         Creates a Customer to the database
         """
         logger.info("Creating %s %s", self.first_name, self.last_name)
-        self.id = None # id must be none to generate next primary key
+        self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
@@ -114,17 +116,18 @@ class Customer(db.Model):
     def deserialize(self, data: dict):
         """ 
         Deserializes a Customer from a dictionary
-        
+
         Args:
             data (dict): A dictionary containing the resource data
         """
-        try: 
+        try:
             self.first_name = data["first_name"]
             self.last_name = data["last_name"]
             self.email = data["email"]
             self.phone_number = data.get("phone_number")
         except KeyError as error:
-            raise DataValidationError("Invalid Customer: missing " + error.args[0])
+            raise DataValidationError(
+                "Invalid Customer: missing " + error.args[0])
         except TypeError as error:
             raise DataValidationError(
                 "Invalid Customer body of request contained bad or no data"
@@ -157,7 +160,7 @@ class Customer(db.Model):
     @classmethod
     def find(cls, customer_id: int):
         """ Finds a Customers by it's ID
-        
+
         :param customer_id: the ID of the Customer to find
         :type customer_id: int
 
@@ -171,7 +174,7 @@ class Customer(db.Model):
     @classmethod
     def find_or_404(cls, customer_id: int):
         """ Find a Customer by it's ID
-        
+
         :param customer_id: the id of the Customer to find
         :type customer_id: int
 
@@ -185,7 +188,7 @@ class Customer(db.Model):
     @classmethod
     def find_by_last_name(cls, last_name: str) -> list:
         """ Returns all Customers with the given last name
-        
+
         :param last_name: the last name of the Customers you want to match
         :type last_name: str
 
@@ -199,7 +202,7 @@ class Customer(db.Model):
     @classmethod
     def find_by_first_name(cls, first_name: str) -> list:
         """ Returns all Customers with the given first name
-        
+
         :param first_name: the first name of the Customers you want to match
         :type first_name: str
 
