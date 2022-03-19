@@ -203,3 +203,8 @@ class TestCustomerServer(unittest.TestCase):
         # check the data just to be sure
         for customer in data:
             self.assertEqual(customer["last_name"], test_last_name)
+
+    def test_create_customer_no_content_type(self):
+        """Create a customer with no content type"""
+        resp = self.app.post(BASE_URL)
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)

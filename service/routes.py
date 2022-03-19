@@ -42,7 +42,7 @@ def list_customers():
     app.logger.info("Request for pet list")
     customers = []
     email = request.args.get("email")
-    last_name = request.args.get("Last_name")
+    last_name = request.args.get("last_name")
     if email:
         customers = Customer.find_by_email(email)
     elif last_name:
