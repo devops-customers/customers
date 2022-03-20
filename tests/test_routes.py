@@ -174,6 +174,7 @@ class TestCustomerServer(unittest.TestCase):
         resp = self.app.get("/customers/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+
     def test_query_customer_list_by_email(self):
         """Query Customers by Email"""
         customers = self.create_customers(10)
@@ -208,3 +209,19 @@ class TestCustomerServer(unittest.TestCase):
         """Create a customer with no content type"""
         resp = self.app.post(BASE_URL)
         self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    # Test delete customer
+    def test_delete_customer(self):
+        """Delete a Customer"""
+        test_customer = self.create_customers(1)[0]
+        resp = self.app.delete(
+            "{0}/{1}".format(BASE_URL, test_customer.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # make sure they are deleted
+        resp = self.app.get(
+            "{0}/{1}".format(BASE_URL, test_customer.id), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
