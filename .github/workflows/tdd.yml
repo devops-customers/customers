@@ -54,7 +54,5 @@ jobs:
           DATABASE_URI: "postgresql://postgres:postgres@postgres:5432/testdb"
 
       - name: Upload code coverage
-        uses: codecov/codecov-action@v2.1.0
-        with:
-          token: 420f36bd-9fd8-45f9-aa7e-7fccdaa2ff63
+        uses: codecov/codecov-action@v2
 
