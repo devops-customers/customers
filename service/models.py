@@ -327,3 +327,17 @@ class Customer(db.Model, PersistentBase):
         """
         logger.info("Processing email query for %s ...", email)
         return cls.query.filter(cls.email == email)
+
+    @classmethod
+    def find_by_phone_number(cls, phone_number: str) -> list:
+        """ Returns all Customers with the given phone_number
+
+        :param phone_number: the first name of the Customers you want to match
+        :type phone_number: str
+
+        :return: a collection of Customers with that phone_number
+        :rtype: list
+
+        """
+        logger.info("Processing phone_number query for %s ...", phone_number)
+        return cls.query.filter(cls.phone_number == phone_number)

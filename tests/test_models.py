@@ -230,6 +230,16 @@ class TestCustomerModel(unittest.TestCase):
         self.assertEqual(same_customer.id, customer.id)
         self.assertEqual(same_customer.last_name, customer.last_name)
 
+    def test_find_by_phone_number(self):
+        """ Find by phone number """
+        customer = self._create_customer()
+        customer.create()
+
+        # Fetch it back by name
+        same_customer = Customer.find_by_phone_number(customer.phone_number)[0]
+        self.assertEqual(same_customer.id, customer.id)
+        self.assertEqual(same_customer.phone_number, customer.phone_number)
+
     def test_serialize_a_customer(self):
         """ Serialize a customer """
         address = self._create_address()
