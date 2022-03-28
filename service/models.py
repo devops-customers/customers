@@ -29,7 +29,7 @@ email
 phone number
 """
 import logging
-from enum import Enum
+#from enum import Enum
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -37,7 +37,6 @@ logger = logging.getLogger("flask.app")
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
-
 
 def init_db(app):
     """Initialize the SQLAlchemy app"""
@@ -47,34 +46,19 @@ def init_db(app):
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
 
-
-class Customer(db.Model):
+######################################################################
+#  P E R S I S T E N T   B A S E   M O D E L
+######################################################################
+class PersistentBase():
     """ 
-    Class that represents a Customer
+   Base class added persistent methods
     """
-
-    ##################################################
-    # Table Schema
-    ##################################################
-    id = db.Column(db.Integer, primary_key=True)
-    first_name = db.Column(db.String(64))
-    last_name = db.Column(db.String(64))
-    email = db.Column(db.String(64))
-    phone_number = db.Column(
-        db.String(32), nullable=True)  # phone # is optional
-
-    ##################################################
-    # INSTANCE METHODS
-    ##################################################
-
-    def __repr__(self):
-        return "<Customer %r id=[%s]>" % (self.last_name, self.id)
 
     def create(self):
         """ 
-        Creates a Customer to the database
+        Creates an Account to the database
         """
-        logger.info("Creating %s %s", self.first_name, self.last_name)
+        logger.info("Creating %s", self.name)
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
@@ -83,56 +67,26 @@ class Customer(db.Model):
         """ 
         Updates a Customer to the database
         """
-        logger.info("Saving %s %s", self.first_name, self.last_name)
+        logger.info("Saving %s", self.name)
         db.session.commit()
 
     def update(self):
         """ 
-        Updates a Customer to the database
+        Updates an Account to the database
         """
-        logger.info("Saving %s", self.last_name)
-        if not self.id:
-            raise DataValidationError("Update called with empty ID field")
+        logger.info("Updating %s", self.name)
+        #if not self.id:
+        #    raise DataValidationError("Update called with empty ID field")
         db.session.commit()
 
     def delete(self):
         """ 
-        Removes a Customer from the data store 
+        Removes an Account from the data store 
         """
-        logger.info("Deleting %s", self.last_name)
+        logger.info("Deleting %s", self.name)
         db.session.delete(self)
         db.session.commit()
 
-    def serialize(self) -> dict:
-        """ Serializes a Customer into a dictionary """
-        return {
-            "id": self.id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "email": self.email,
-            "phone_number": self.phone_number
-        }
-
-    def deserialize(self, data: dict):
-        """ 
-        Deserializes a Customer from a dictionary
-
-        Args:
-            data (dict): A dictionary containing the resource data
-        """
-        try:
-            self.first_name = data["first_name"]
-            self.last_name = data["last_name"]
-            self.email = data["email"]
-            self.phone_number = data.get("phone_number")
-        except KeyError as error:
-            raise DataValidationError(
-                "Invalid Customer: missing " + error.args[0])
-        except TypeError as error:
-            raise DataValidationError(
-                "Invalid Customer body of request contained bad or no data"
-            )
-        return self
     ##################################################
     # CLASS METHODS
     ##################################################
@@ -147,6 +101,7 @@ class Customer(db.Model):
         """
         logger.info("Initializing database")
         # This is where we initialize SQLAlchemy from the Flask app
+        cls.app = app
         db.init_app(app)
         app.app_context().push()
         db.create_all()  # make our sqlalchemy tables
@@ -154,12 +109,12 @@ class Customer(db.Model):
     @classmethod
     def all(cls) -> list:
         """Returns all of the Customers in the database"""
-        logger.info("Processing all Customers")
+        logger.info("Processing all Records")
         return cls.query.all()
 
     @classmethod
-    def find(cls, customer_id: int):
-        """ Finds a Customers by it's ID
+    def find(cls, by_id: int):
+        """ Finds a Record by it's ID
 
         :param customer_id: the ID of the Customer to find
         :type customer_id: int
@@ -168,8 +123,140 @@ class Customer(db.Model):
         :rtype: Customer
 
         """
-        logger.info("Processing lookup for id %s ...", customer_id)
-        return cls.query.get(customer_id)
+        logger.info("Processing lookup for id %s ...", by_id)
+        return cls.query.get(by_id)
+
+######################################################################
+#  A D D R E S S   M O D E L
+######################################################################
+class Address(db.Model, PersistentBase):
+    """
+    Class that represents an Item
+    """
+    ##################################################
+    # Table Schema
+    ##################################################
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    name = db.Column(db.String(64)) # e.g., work, home, vacation, etc.
+    street = db.Column(db.String(64))
+    city = db.Column(db.String(64))
+    state = db.Column(db.String(2))
+    postalcode = db.Column(db.String(16))
+
+    ##################################################
+    # INSTANCE METHODS
+    ##################################################
+    def __repr__(self):
+        return "<Address %r id=[%s] customer[%s]>" % (self.name, self.id, self.customer_id)
+
+    def __str__(self):
+        return "%s: %s, %s, %s %s" % (self.name, self.street, self.city, self.state, self.postalcode)
+
+    def serialize(self):
+        """ Serializes an Address into a dictionary """
+        return {
+            "id": self.id,
+            "customer_id": self.customer_id,
+            "name": self.name,
+            "street": self.street,
+            "city": self.city,
+            "state": self.state,
+            "postalcode": self.postalcode
+        }
+    
+    def deserialize(self, data):
+        """
+        Deserializes an Address from a dictionary
+        Args:
+            data (dict): A dictionary containing the resource data
+        """
+        try:
+            self.customer_id = data["customer_id"]
+            self.name = data["name"]
+            self.street = data["street"]
+            self.city = data["city"]
+            self.state = data["state"]
+            self.postalcode = data["postalcode"]
+        except KeyError as error:
+            raise DataValidationError("Invalid Address: missing " + error.args[0])
+        except TypeError as error:
+            raise DataValidationError(
+                "Invalid Address: body of request contained" "bad or no data"
+            )
+        return self
+
+######################################################################
+#  A C C O U N T   M O D E L
+######################################################################
+class Customer(db.Model, PersistentBase):
+    """ 
+    Class that represents a Customer
+    """
+
+    app = None
+
+    ##################################################
+    # Table Schema
+    ##################################################
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64)) # Username
+    first_name = db.Column(db.String(64))
+    last_name = db.Column(db.String(64))
+    email = db.Column(db.String(64))
+    phone_number = db.Column(
+        db.String(32), nullable=True)  # phone # is optional
+    addresses = db.relationship('Address', backref='customer', lazy=True)
+
+    ##################################################
+    # INSTANCE METHODS
+    ##################################################
+
+    def __repr__(self):
+        return "<Customer %r id=[%s]>" % (self.name, self.id)
+
+    def serialize(self) -> dict:
+        """ Serializes a Customer into a dictionary """
+        customer = {
+            "id": self.id,
+            "name": self.name,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "phone_number": self.phone_number,
+            "addresses": []
+        }
+        for address in self.addresses:
+            customer['addresses'].append(address.serialize())
+        return customer
+
+    def deserialize(self, data: dict):
+        """ 
+        Deserializes a Customer from a dictionary
+
+        Args:
+            data (dict): A dictionary containing the resource data
+        """
+        try:
+            self.name = data["name"]
+            self.first_name = data["first_name"]
+            self.last_name = data["last_name"]
+            self.email = data["email"]
+            self.phone_number = data.get("phone_number")
+            # handle inner list of addresses
+            address_list = data.get("addresses")
+            for json_address in address_list:
+                address = Address()
+                address.deserialize(json_address)
+                self.addresses.append(address)
+        except KeyError as error:
+            raise DataValidationError(
+                "Invalid Customer: missing " + error.args[0])
+        except TypeError as error:
+            raise DataValidationError(
+                "Invalid Customer body of request contained bad or no data"
+            )
+        return self
 
     @classmethod
     def find_or_404(cls, customer_id: int):
@@ -184,6 +271,20 @@ class Customer(db.Model):
         """
         logger.info("Processing lookup or 404 for id %s ...", customer_id)
         return cls.query.get_or_404(customer_id)
+
+    @classmethod
+    def find_by_name(cls, name: str) -> list:
+        """ Returns all Customers with the given last name
+
+        :param name: the user name of the Customers you want to match
+        :type name: str
+
+        :return: a collection of Customers with that last name
+        :rtype: list
+
+        """
+        logger.info("Processing last name query for %s ...", name)
+        return cls.query.filter(cls.name == name)
 
     @classmethod
     def find_by_last_name(cls, last_name: str) -> list:

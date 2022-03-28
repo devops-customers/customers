@@ -17,7 +17,7 @@ Test Factory to make fake objects for testing
 """
 import factory
 from factory.fuzzy import FuzzyChoice
-from service.models import Customer
+from service.models import Customer, Address
 
 class CustomerFactory(factory.Factory):
     """ Creates fake customers """
@@ -27,7 +27,25 @@ class CustomerFactory(factory.Factory):
         model = Customer
 
     id = factory.Sequence(lambda n: n)
+    name = factory.Faker("user_name")
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     email = factory.Faker("email")
     phone_number = factory.Faker("phone_number")
+
+class AddressFactory(factory.Factory):
+    """ Creates fake addresses """
+
+    class Meta:
+        model = Address
+    
+    id = factory.Sequence(lambda n: n)
+    customer_id = factory.RelatedFactory(
+        CustomerFactory
+    #    factory_related_name='customer'
+    )
+    name = FuzzyChoice(choices = ["Home", "Work", "Vacation", "Other"])
+    street = factory.Faker("street_address")
+    city = factory.Faker("city")
+    state = factory.Faker("state_abbr")
+    postalcode = factory.Faker("postcode")
