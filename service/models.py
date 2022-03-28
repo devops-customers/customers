@@ -27,6 +27,7 @@ first name
 last name
 email
 phone number
+address
 """
 import logging
 from enum import Enum
@@ -62,6 +63,7 @@ class Customer(db.Model):
     email = db.Column(db.String(64))
     phone_number = db.Column(
         db.String(32), nullable=True)  # phone # is optional
+    address = db.Column(db.String(64))
 
     ##################################################
     # INSTANCE METHODS
@@ -110,7 +112,8 @@ class Customer(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "phone_number": self.phone_number
+            "phone_number": self.phone_number,
+            "address": self.address
         }
 
     def deserialize(self, data: dict):
@@ -125,6 +128,7 @@ class Customer(db.Model):
             self.last_name = data["last_name"]
             self.email = data["email"]
             self.phone_number = data.get("phone_number")
+            self.address = data["address"]
         except KeyError as error:
             raise DataValidationError(
                 "Invalid Customer: missing " + error.args[0])
