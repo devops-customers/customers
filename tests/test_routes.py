@@ -19,7 +19,7 @@ import unittest
 from urllib.parse import quote_plus
 from service import app, status
 from service.models import db, init_db
-from .factories import CustomerFactory
+from .factories import CustomerFactory, AddressFactory
 
 # Disable all but critical errors during normal test run
 # uncomment for debugging failing tests
@@ -62,6 +62,10 @@ class TestCustomerServer(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+
+######################################################################
+#  H E L P E R   M E T H O D S
+######################################################################
 
     def create_customers(self, count):
         """Factory method to create customers in bulk"""
@@ -205,6 +209,21 @@ class TestCustomerServer(unittest.TestCase):
         for customer in data:
             self.assertEqual(customer["last_name"], test_last_name)
 
+    def test_query_customer_list_by_username(self):
+        """Query Customers by username """
+        customers = self.create_customers(10)
+        test_name = customers[0].name
+        name_customers = [customer for customer in customers if customer.name == test_name]
+        resp = self.app.get(
+            BASE_URL, query_string="name={}".format(quote_plus(test_name))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(name_customers))
+        # check the data just to be sure
+        for customer in data:
+            self.assertEqual(customer["name"], test_name)
+
     def test_create_customer_no_content_type(self):
         """Create a customer with no content type"""
         resp = self.app.post(BASE_URL)
@@ -225,3 +244,178 @@ class TestCustomerServer(unittest.TestCase):
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_update_customer_id_not_found(self):
+        """ Update customer id that does not exist """
+        # create a customer to update
+        test_customer = CustomerFactory()
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the customer
+        new_customer = resp.get_json()
+        logging.debug(new_customer)
+        new_customer["email"] = "new@email.com"
+        resp = self.app.put(
+            "/customers/2",
+            json=new_customer,
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+######################################################################
+#  A D D R E S S   T E S T   C A S E S
+######################################################################
+    def test_get_address_list(self):
+        """ Get a list of Addresses """
+        # add two addresses to customer
+        customer = self.create_customers(1)[0]
+        address_list = AddressFactory.create_batch(2)
+        logging.debug(customer)
+        logging.debug(address_list)
+        logging.debug(address_list[0].serialize())
+        # Create address 1
+        resp = self.app.post(
+            f"{BASE_URL}/{customer.id}/addresses",
+            json=address_list[0].serialize(),
+            content_type="application/json"
+        )
+        logging.debug(customer.addresses)
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # Create address 2
+        resp = self.app.post(
+            f"{BASE_URL}/{customer.id}/addresses",
+            json=address_list[1].serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # get the list back and make sure there are 2
+        resp = self.app.get(
+            f"/customers/{customer.id}/addresses", 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        self.assertEqual(len(data), 2)
+
+
+    def test_add_address(self):
+        """ Add an address to an customer """
+        customer = self.create_customers(1)[0]
+        address = AddressFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/{customer.id}/addresses",
+            json=address.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["customer_id"], customer.id)
+        self.assertEqual(data["name"], address.name)
+        self.assertEqual(data["street"], address.street)
+        self.assertEqual(data["city"], address.city)
+        self.assertEqual(data["state"], address.state)
+        self.assertEqual(data["postalcode"], address.postalcode)
+
+    def test_get_address(self):
+        """ Get an address from a customer """
+        # create a known address
+        customer = self.create_customers(1)[0]
+        address = AddressFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/{customer.id}/addresses",
+            json=address.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        address_id = data["id"]
+
+        # retrieve it back
+        resp = self.app.get(
+            f"{BASE_URL}/{customer.id}/addresses/{address_id}",
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["customer_id"], customer.id)
+        self.assertEqual(data["name"], address.name)
+        self.assertEqual(data["street"], address.street)
+        self.assertEqual(data["city"], address.city)
+        self.assertEqual(data["state"], address.state)
+        self.assertEqual(data["postalcode"], address.postalcode)
+
+    def test_update_address(self):
+        """ Update an address on a customer """
+        # create a known address
+        customer = self.create_customers(1)[0]
+        address = AddressFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/{customer.id}/addresses", 
+            json=address.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        data = resp.get_json()
+        logging.debug(data)
+        address_id = data["id"]
+        data["name"] = "XXXX"
+
+        # send the update back
+        resp = self.app.put(
+            f"{BASE_URL}/{customer.id}/addresses/{address_id}",
+            json=data, 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        # retrieve it back
+        resp = self.app.get(
+            f"{BASE_URL}/{customer.id}/addresses/{address_id}",
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+
+        data = resp.get_json()
+        logging.debug(data)
+        self.assertEqual(data["id"], address_id)
+        self.assertEqual(data["customer_id"], customer.id)
+        self.assertEqual(data["name"], "XXXX")
+
+    def test_delete_address(self):
+        """ Delete an Address """
+        customer = self.create_customers(1)[0]
+        address = AddressFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/{customer.id}/addresses",
+            json=address.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+        data = resp.get_json()
+        logging.debug(data)
+        address_id = data["id"]
+
+        # send delete request
+        resp = self.app.delete(
+            f"{BASE_URL}/{customer.id}/addresses/{address_id}",
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+
+        # retrieve it back and make sure address is not there
+        resp = self.app.get(
+            f"{BASE_URL}/{customer.id}/addresses/{address_id}",
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)

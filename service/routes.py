@@ -9,10 +9,9 @@ POST /customers - creates a new Customer record in the database
 PUT /customers/{id} - updates a Customer record in the database
 DELETE /customers/{id} - deletes a Customer record in the database
 """
-
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from werkzeug.exceptions import NotFound
-from service.models import Customer, DataValidationError
+from service.models import Customer, Address, DataValidationError
 from . import status  # HTTP Status Codes
 from . import app # Import Flask application
 
@@ -39,14 +38,17 @@ def index():
 @app.route("/customers", methods=["GET"])
 def list_customers():
     """Returns all of the Customers"""
-    app.logger.info("Request for pet list")
+    app.logger.info("Request for Customer list")
     customers = []
     email = request.args.get("email")
     last_name = request.args.get("last_name")
+    name = request.args.get("name")
     if email:
         customers = Customer.find_by_email(email)
     elif last_name:
         customers = Customer.find_by_last_name(last_name)
+    elif name:
+        customers =Customer.find_by_name(name)
     else:
         customers = Customer.all()
 
@@ -134,6 +136,106 @@ def delete_customers(customer_id):
         customer.delete()
 
     app.logger.info("Customer with ID [%s] delete complete.", customer_id)
+    return make_response("", status.HTTP_204_NO_CONTENT)
+
+#---------------------------------------------------------------------
+#                A D D R E S S   M E T H O D S
+#---------------------------------------------------------------------
+######################################################################
+# LIST ADDRESSES
+######################################################################
+@app.route("/customers/<int:customer_id>/addresses", methods=["GET"])
+def list_addresses(customer_id):
+    """ Returns all of the Addresses for an Customer """
+    app.logger.info("Request for all Addresses for Customer with id: %s", customer_id)
+
+    customer = Customer.find(customer_id)
+    if not customer:
+        abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{customer_id}' could not be found.")
+    
+    results = [address.serialize() for address in customer.addresses]
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
+######################################################################
+# ADD AN ADDRESS TO A CUSTOMER
+######################################################################
+@app.route('/customers/<int:customer_id>/addresses', methods=["POST"])
+def create_addresses(customer_id):
+    """ 
+    Create an Address on a Customer
+    
+    This endpoint will add an address to an customer
+    """
+    app.logger.info("Request to create an Address for Customer with id: %s", customer_id)
+    check_content_type("application/json")
+
+    customer = Customer.find(customer_id)
+    if not customer:
+        abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{customer_id}' could not be found.")
+    
+    address = Address()
+    address.deserialize(request.get_json())
+    customer.addresses.append(address)
+    customer.update()
+    message = address.serialize()
+    return make_response(jsonify(message), status.HTTP_201_CREATED)
+
+######################################################################
+# RETRIEVE AN ADDRESS FROM CUSTOMER
+######################################################################
+@app.route('/customers/<int:customer_id>/addresses/<int:address_id>', methods=['GET'])
+def get_addresses(customer_id, address_id):
+    """
+    Get an Address
+    
+    This endpoint returns just an address
+    """ 
+    app.logger.info("Request to retrieve address %s for Customer id: %s", (address_id, customer_id))
+
+    address = Address.find(address_id)
+    if not address:
+        abort(status.HTTP_404_NOT_FOUND, f"Customer with Address id '{address_id}' could not be found.")
+    
+    return make_response(jsonify(address.serialize()), status.HTTP_200_OK)
+
+######################################################################
+# UPDATE AN ADDRESS
+######################################################################
+@app.route("/customers/<int:customer_id>/addresses/<int:address_id>", methods=['PUT'])
+def update_addresses(customer_id, address_id):
+    """ 
+    Update an Address
+    
+    This endpoint will update an Address based on the body that is posted
+    """
+    app.logger.info("Request to update Address %s for Customer id: %s", (address_id, customer_id))
+    check_content_type("application/json")
+    address = Address.find(address_id)
+    if not address:
+        abort(status.HTTP_404_NOT_FOUND, f"Customer with Address id '{address_id}' could not be found.")
+    
+    address.deserialize(request.get_json())
+    address.id = address_id
+    address.update()
+    return make_response(jsonify(address.serialize()), status.HTTP_200_OK)
+    
+
+######################################################################
+# DELETE AN ADDRESS
+######################################################################
+@app.route("/customers/<int:customer_id>/addresses/<int:address_id>", methods=['DELETE'])
+def delete_addresses(customer_id, address_id):
+    """ 
+    Delete an Address
+    
+    This endpoint will delete an Address based on the id specified in the path
+    """
+    app.logger.info("Request to delete Address %s for Customer id: %s", (address_id, customer_id))
+
+    address = Address.find(address_id)
+    if address:
+        address.delete()
+
     return make_response("", status.HTTP_204_NO_CONTENT)
 
 
