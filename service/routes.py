@@ -252,3 +252,25 @@ def check_content_type(media_type):
         status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
         "Content-Type must be {}".format(media_type),
     )
+
+######################################################################
+# UPDATE AN CUSTOMER'S STATUS to SUSPEND
+######################################################################
+@app.route("/customers/<int:customer_id>/suspend", methods=["PUT"])
+def suspend_customers(customer_id):
+    """Update a Customer's status to suspend
+
+    This endpoint will update a Customer based the body that is posted
+    """
+    app.logger.info("Request to suspend customer with id: %s", customer_id)
+    check_content_type("application/json")
+    customer = Customer.find(customer_id)
+    if not customer:
+        raise NotFound(
+           "Customer with id '{}' was not found.".format(customer_id))
+    customer.deserialize(request.get_json())
+    customer.account_status = "suspended"
+    customer.update()
+
+    app.logger.info("Customerwith ID [%s] updated.", customer.id)
+    return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)

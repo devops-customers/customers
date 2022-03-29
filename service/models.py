@@ -207,6 +207,7 @@ class Customer(db.Model, PersistentBase):
     phone_number = db.Column(
         db.String(32), nullable=True)  # phone # is optional
     addresses = db.relationship('Address', backref='customer', lazy=True)
+    account_status = db.Column(db.String(64)) #create a column for customer status
 
     ##################################################
     # INSTANCE METHODS
@@ -224,7 +225,8 @@ class Customer(db.Model, PersistentBase):
             "last_name": self.last_name,
             "email": self.email,
             "phone_number": self.phone_number,
-            "addresses": []
+            "addresses": [],
+            "account_status": self.account_status
         }
         for address in self.addresses:
             customer['addresses'].append(address.serialize())
@@ -249,6 +251,7 @@ class Customer(db.Model, PersistentBase):
                 address = Address()
                 address.deserialize(json_address)
                 self.addresses.append(address)
+            self.account_status = data["account_status"]
         except KeyError as error:
             raise DataValidationError(
                 "Invalid Customer: missing " + error.args[0])

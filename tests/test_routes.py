@@ -419,3 +419,27 @@ class TestCustomerServer(unittest.TestCase):
             content_type="application/json"
         )
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+        
+        # Test suspend the customer
+    def test_suspend_customer(self):
+        """suspend an existing customer"""
+        # create a customer to suspend
+        test_customer = CustomerFactory()
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # suspend the customer
+        new_customer = resp.get_json()
+        logging.debug(new_customer)
+        resp = self.app.put(
+            "/customers/{}/suspend".format(new_customer["id"]),
+            json=new_customer,
+            content_type=CONTENT_TYPE_JSON,
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_customer = resp.get_json()
+        logging.debug(updated_customer)
+        self.assertEqual(updated_customer["account_status"],"suspended")
