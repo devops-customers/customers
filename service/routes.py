@@ -43,12 +43,15 @@ def list_customers():
     email = request.args.get("email")
     last_name = request.args.get("last_name")
     name = request.args.get("name")
+    phone_number = request.args.get("phone_number")
     if email:
         customers = Customer.find_by_email(email)
     elif last_name:
         customers = Customer.find_by_last_name(last_name)
     elif name:
         customers =Customer.find_by_name(name)
+    elif phone_number:
+        customers =Customer.find_by_phone_number(phone_number)
     else:
         customers = Customer.all()
 
