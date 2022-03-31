@@ -154,6 +154,26 @@ class TestCustomerServer(unittest.TestCase):
         logging.debug(updated_customer)
         self.assertEqual(updated_customer["email"], "new@email.com")
 
+    def test_update_customer_id_not_found(self):
+        """ Update customer id that does not exist """
+        # create a customer to update
+        test_customer = CustomerFactory()
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the customer
+        new_customer = resp.get_json()
+        logging.debug(new_customer)
+        new_customer["email"] = "new@email.com"
+        resp = self.app.put(
+            "/customers/2",
+            json=new_customer,
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_get_customer_list(self):
         """Get a list of Customers"""
         self.create_customers(5)
@@ -443,3 +463,91 @@ class TestCustomerServer(unittest.TestCase):
         updated_customer = resp.get_json()
         logging.debug(updated_customer)
         self.assertEqual(updated_customer["account_status"],"suspended")
+    
+    def test_suspend_customer_not_found(self):
+        """Suspend a non-existent customer"""
+        # create a customer to update
+        test_customer = CustomerFactory()
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the customer
+        new_customer = resp.get_json()
+        logging.debug(new_customer)
+        resp = self.app.put(
+            "/customers/2/suspend".format(new_customer["id"]),
+            json=new_customer,
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_address_id_not_found(self):
+        """ Update address of customer id that does not exist """
+        address = AddressFactory()
+        # try to update an address where customer id does not exists
+        resp = self.app.put(
+            f"{BASE_URL}/99/addresses/1",
+            json=address.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_address_not_found(self):
+        """Get an address of a customer thats not found"""
+        resp = self.app.get("/customers/0/addresses")
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_add_address_customer_not_found(self):
+        """ Add an address to a customer that does not exist"""
+        address = AddressFactory()
+        resp = self.app.post(
+            f"{BASE_URL}/0/addresses",
+            json=address.serialize(), 
+            content_type="application/json"
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    # Test restore the customer
+    def test_restore_customer(self):
+        """suspend an existing customer"""
+        # create a customer to suspend
+        test_customer = CustomerFactory()
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # suspend the customer
+        new_customer = resp.get_json()
+        logging.debug(new_customer)
+        resp = self.app.put(
+            "/customers/{}/restore".format(new_customer["id"]),
+            json=new_customer,
+            content_type=CONTENT_TYPE_JSON,
+        )
+
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        updated_customer = resp.get_json()
+        logging.debug(updated_customer)
+        self.assertEqual(updated_customer["account_status"],"active")
+
+    def test_restore_customer_not_found(self):
+        """Restore a non-existent customer"""
+        # create a customer to update
+        test_customer = CustomerFactory()
+        resp = self.app.post(
+            BASE_URL, json=test_customer.serialize(), content_type=CONTENT_TYPE_JSON
+        )
+        self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
+
+        # update the customer
+        new_customer = resp.get_json()
+        logging.debug(new_customer)
+        resp = self.app.put(
+            "/customers/2/restore".format(new_customer["id"]),
+            json=new_customer,
+            content_type=CONTENT_TYPE_JSON,
+        )
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
