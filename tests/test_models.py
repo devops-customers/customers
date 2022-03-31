@@ -367,27 +367,6 @@ class TestCustomerModel(unittest.TestCase):
         customer = Customer.find(customer.id)
         self.assertEqual(len(customer.addresses),0)
 
-    # Need a test of address __repr__ method
-    # Need a test of address __str__ method
-    # Need a test of address.serialize
-    # Need a test of address.deserialize method
-
-    # Need a test of customer.serialize
-    # Need a test of customer.deserialize
-    # Need a test of find_by_address
-
-    # def test_find_by_address(self):
-    #     """ Find by address """
-    #     customer = self._create_customer()
-    #     address = self._create_address()
-    #     customer.addresses.append(address)
-    #     customer.create()
-
-    #     # Fetch it back by name
-    #     same_customer = Customer.find_by_address(customer.addresses)[0]
-    #     self.assertEqual(same_customer.id, customer.id)
-    #     self.assertEqual(same_customer.addresses, customer.addresses)
-
     def test_find_by_street(self):
         """ Find by street address """
         customer = self._create_customer()
@@ -397,4 +376,14 @@ class TestCustomerModel(unittest.TestCase):
 
         same_customer = Customer.find_by_street(address.street)
         logging.debug(same_customer[0])
+        self.assertEqual(same_customer[0], customer)
+
+    def test_find_by_postalcode(self):
+        """ Find by postal code """
+        customer = self._create_customer()
+        address = self._create_address()
+        customer.addresses.append(address)
+        customer.create()
+
+        same_customer = Customer.find_by_postalcode(address.postalcode)
         self.assertEqual(same_customer[0], customer)
