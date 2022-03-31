@@ -346,16 +346,29 @@ class Customer(db.Model, PersistentBase):
         return cls.query.filter(cls.phone_number == phone_number)
 
         
+    # @classmethod
+    # def find_by_address(cls, addresses: str) -> list:
+    #     """ Returns all Customers with the given addess
+
+    #     :param addresss: the number of the Customers you want to match
+    #     :type addresss: str
+
+    #     :return: a collection of Customers with that addresss
+    #     :rtype: list
+
+    #     """
+    #     logger.info("Processing phone_number query for %s ...", addresses)
+    #     logger.info(type(addresses['id']))
+    #     #logger.info(cls.addresses.query(addresses.id))
+    #     return cls.query.filter(cls.addresses.any(addresses))
+    
     @classmethod
-    def find_by_address(cls, addresses: str) -> list:
+    def find_by_street(cls, street: str) -> list:
         """ Returns all Customers with the given addess
-
-        :param addresss: the number of the Customers you want to match
-        :type addresss: str
-
-        :return: a collection of Customers with that addresss
-        :rtype: list
-
         """
-        logger.info("Processing phone_number query for %s ...", addresses)
-        return cls.query.filter(cls.addresses == addresses)
+        logger.info("Processing street address query for %s ...", street)
+        logging.debug(cls.addresses)
+        #q = session.query(cls).outerjoin(cls.addresses)
+        q = cls.query.outerjoin(cls.addresses).filter(Address.street == street)
+        logging.debug(type(q.all()))
+        return q.all()
