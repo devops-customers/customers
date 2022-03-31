@@ -8,6 +8,17 @@ GET /customers/{id} - Returns the Customer with a given id number
 POST /customers - creates a new Customer record in the database
 PUT /customers/{id} - updates a Customer record in the database
 DELETE /customers/{id} - deletes a Customer record in the database
+
+GET /customers/{id}/addresses - Returns a list of all the addresses for a customer
+POST /customers/{id}/addresses - Add an address to a customer
+GET /customers/{id}/addresses/{id} - Get a specific address for a given customer
+PUT /customers/{id}/addresses/{id} - Update a specific address for a given customer
+DELETE /customers/{id}/addresses/{id} - Delete a specific address for a given customer
+
+Actions:
+--------
+PUT /customers/{id}/suspend - suspend a customer account
+PUT /customers/{id}/restore - restore a suspended customer account
 """
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from werkzeug.exceptions import NotFound
@@ -274,3 +285,27 @@ def suspend_customers(customer_id):
 
     app.logger.info("Customerwith ID [%s] updated.", customer.id)
     return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
+
+######################################################################
+# RESTORE A SUSPENDED CUSTOMER
+######################################################################
+@app.route("/customers/<int:customer_id>/restore", methods=["PUT"])
+def restore_customers(customer_id):
+    """ Update a customer's status from suspend to active
+    
+    This endpoint will update a customer based on the body that is posted
+    """
+    app.logger.info("Request to restore customer with id: %s", customer_id)
+    check_content_type("application/json")
+    customer = Customer.find(customer_id)
+    if not customer:
+        raise NotFound(
+            "Customer with id '{}' was not found.".format(customer_id)
+        )
+    customer.deserialize(request.get_json())
+    customer.account_status = "active"
+    customer.update()
+
+    app.logger.info("Customer with ID [%s] updated.", customer.id)
+    return make_response(jsonify(customer.serialize()), status.HTTP_200_OK)
+
