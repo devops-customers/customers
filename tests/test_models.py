@@ -374,3 +374,16 @@ class TestCustomerModel(unittest.TestCase):
 
     # Need a test of customer.serialize
     # Need a test of customer.deserialize
+    # Need a test of find_by_address
+
+    def test_find_by_address(self):
+        """ Find by address """
+        customer = self._create_customer()
+        address = self._create_address()
+        customer.addresses.append(address)
+        customer.create()
+
+        # Fetch it back by name
+        same_customer = Customer.find_by_address(customer.addresses)[0]
+        self.assertEqual(same_customer.id, customer.id)
+        self.assertEqual(same_customer.addresses, customer.addresses)

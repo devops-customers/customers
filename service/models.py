@@ -335,7 +335,7 @@ class Customer(db.Model, PersistentBase):
     def find_by_phone_number(cls, phone_number: str) -> list:
         """ Returns all Customers with the given phone_number
 
-        :param phone_number: the first name of the Customers you want to match
+        :param phone_number: the number of the Customers you want to match
         :type phone_number: str
 
         :return: a collection of Customers with that phone_number
@@ -344,3 +344,18 @@ class Customer(db.Model, PersistentBase):
         """
         logger.info("Processing phone_number query for %s ...", phone_number)
         return cls.query.filter(cls.phone_number == phone_number)
+
+        
+    @classmethod
+    def find_by_address(cls, addresses: str) -> list:
+        """ Returns all Customers with the given addess
+
+        :param addresss: the number of the Customers you want to match
+        :type addresss: str
+
+        :return: a collection of Customers with that addresss
+        :rtype: list
+
+        """
+        logger.info("Processing phone_number query for %s ...", addresses)
+        return cls.query.filter(cls.addresses == addresses)
