@@ -55,6 +55,8 @@ def list_customers():
     last_name = request.args.get("last_name")
     name = request.args.get("name")
     phone_number = request.args.get("phone_number")
+    postalcode = request.args.get("address.postalcode")
+    street = request.args.get("address.street")
     if email:
         customers = Customer.find_by_email(email)
     elif last_name:
@@ -63,6 +65,10 @@ def list_customers():
         customers =Customer.find_by_name(name)
     elif phone_number:
         customers =Customer.find_by_phone_number(phone_number)
+    elif postalcode:
+        customers =Customer.find_by_postalcode(address.postalcode)
+    elif street:
+        customers =Customer.find_by_street(address.street)
     else:
         customers = Customer.all()
 
