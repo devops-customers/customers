@@ -229,6 +229,22 @@ class TestCustomerServer(unittest.TestCase):
         for customer in data:
             self.assertEqual(customer["last_name"], test_last_name)
 
+    def test_query_customer_list_by_phone_number(self):
+        """Query Customers by phone_number"""
+        customers = self.create_customers(10)
+        test_phone_number = customers[0].phone_number
+        phone_number_customers = [customer for customer in customers if customer.phone_number == test_phone_number]
+        resp = self.app.get(
+            BASE_URL, query_string="phone_number={}".format(quote_plus(test_phone_number))
+        )
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = resp.get_json()
+        self.assertEqual(len(data), len(phone_number_customers))
+        # check the data just to be sure
+        for customer in data:
+            self.assertEqual(customer["phone_number"], test_phone_number)
+
+
     def test_query_customer_list_by_username(self):
         """Query Customers by username """
         customers = self.create_customers(10)
