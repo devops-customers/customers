@@ -2,6 +2,9 @@
 # Python 3 with PostgreSQL
 version: "3"
 
+# # For ERROR: ... services.app.volumes contains an invalid type, it should be a string
+# version: "3.2"
+
 services:
   app:
     build:
@@ -12,6 +15,7 @@ services:
     #   - 8000:8000
     volumes:
       - ..:/app
+      - ~/.bluemix/:/home/devops/.bluemix/
     command: sleep infinity
     environment:
       FLASK_APP: service:app

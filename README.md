@@ -6,3 +6,7 @@
 # add codecov badge
 
 This is the repo for the customers group in Spring 2022 Tech MBA DevOps.
+
+## How to run
+
+`python -m flask run`
