@@ -1,6 +1,9 @@
 # Image for a Python 3 development environment
 FROM python:3.9-slim
 
+# # For Feiyang to speed up
+# Run sed -i 's/deb.debian.org/mirrors.tencent.com/' /etc/apt/sources.list
+
 # Add any tools that are needed beyond Python 3.9
 RUN apt-get update && \
     apt-get install -y sudo vim git zip tree curl wget jq && \
@@ -27,6 +30,11 @@ WORKDIR /app
 COPY requirements.txt .
 RUN python -m pip install --upgrade pip wheel && \
     pip install -r requirements.txt
+
+# # For Feiyang to speed up
+# RUN python -m pip install -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com --upgrade pip wheel && \
+#     pip install -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com -r requirements.txt
+
 
 EXPOSE 8000
 
