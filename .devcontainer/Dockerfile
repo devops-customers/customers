@@ -5,13 +5,12 @@ FROM python:3.9-slim
 # Run sed -i 's/deb.debian.org/mirrors.tencent.com/' /etc/apt/sources.list
 
 # Add any tools that are needed beyond Python 3.9
+# NEW: Add bash-completion so that Press TAB can complete the command
 RUN apt-get update && \
-    apt-get install -y sudo vim git zip tree curl wget jq && \
+    apt-get install -y sudo vim git zip tree curl wget jq bash-completion && \
     apt-get autoremove -y && \
     apt-get clean -y
 
-# Add bash completion so that TAB can complete the command
-RUN apt-get install -y bash-completion
 
 # Create a user for development
 ARG USERNAME=devops
