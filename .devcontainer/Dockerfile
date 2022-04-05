@@ -10,6 +10,9 @@ RUN apt-get update && \
     apt-get autoremove -y && \
     apt-get clean -y
 
+# Add bash completion so that TAB can complete the command
+RUN apt-get install -y bash-completion
+
 # Create a user for development
 ARG USERNAME=devops
 ARG USER_UID=1000
