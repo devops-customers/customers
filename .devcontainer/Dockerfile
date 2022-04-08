@@ -37,8 +37,8 @@ RUN python -m pip install --upgrade pip wheel && \
 # RUN python -m pip install -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com --upgrade pip wheel && \
 #     pip install -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com -r requirements.txt
 
-
-EXPOSE 8000
+ENV PORT 8080
+EXPOSE $PORT
 
 # Enable color terminal for docker exec bash
 ENV TERM=xterm-256color
