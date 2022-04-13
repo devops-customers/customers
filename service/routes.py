@@ -27,20 +27,30 @@ from . import status  # HTTP Status Codes
 from . import app # Import Flask application
 
 ######################################################################
+# GET HEALTH CHECK
+######################################################################
+@app.route("/healthcheck")
+def healthcheck():
+    """Let them know our heart is still beating"""
+    return make_response(jsonify(status=200, message="Healthy"), status.HTTP_200_OK)
+
+
+######################################################################
 # GET INDEX
 ######################################################################
 @app.route("/")
 def index():
     """Root URL response"""
     app.logger.info("Request for Root URL")
-    return (
-        jsonify(
-            name="Customer Service",
-            version="1.0",
-            url=url_for("list_customers", _external=True),
-        ),
-        status.HTTP_200_OK,
-    )
+    # return (
+    #     jsonify(
+    #         name="Customer Service",
+    #         version="1.0",
+    #         url=url_for("list_customers", _external=True),
+    #     ),
+    #     status.HTTP_200_OK,
+    #)
+    return app.send_static_file("index.html")
 
 
 ######################################################################
@@ -51,7 +61,9 @@ def list_customers():
     """Returns all of the Customers"""
     app.logger.info("Request for Customer list")
     customers = []
+    id = request.args.get("id")
     email = request.args.get("email")
+    first_name = request.args.get("first_name")
     last_name = request.args.get("last_name")
     name = request.args.get("name")
     phone_number = request.args.get("phone_number")
@@ -63,6 +75,8 @@ def list_customers():
         customers = Customer.find_by_last_name(last_name)
     elif name:
         customers =Customer.find_by_name(name)
+    elif first_name:
+        customers = Customer.find_by_first_name(first_name)
     elif phone_number:
         customers =Customer.find_by_phone_number(phone_number)
     elif postalcode:

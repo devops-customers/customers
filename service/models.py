@@ -274,7 +274,7 @@ class Customer(db.Model, PersistentBase):
         """
         logger.info("Processing lookup or 404 for id %s ...", customer_id)
         return cls.query.get_or_404(customer_id)
-
+    
     @classmethod
     def find_by_name(cls, name: str) -> list:
         """ Returns all Customers with the given last name

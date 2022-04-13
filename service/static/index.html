@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Customer RESTful Service</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="static/css/flatly_bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+          <h1>Customer REST API Service</h1>
+      </div>
+
+      <!-- Flash Message -->
+      <div class="table-responsive">
+        <table class="table">
+          <tr><td>Status:</td><td><span id="flash_message"></span></td></tr>
+        </table>
+      </div>
+
+      <!-- FORM -->
+      <div class="col-md-15" id="form-data">
+        <h3>Create, Retrieve, Update, and Delete a Customer:</h3>
+        <div class="form-horizontal">
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="customer_id">Customer ID:</label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control" id="customer_id" placeholder="Enter ID of Customer">
+            </div>
+            <div class="col-sm-4">
+              <button type="submit" class="btn btn-primary" id="retrieve-btn">Retrieve</button>
+              <button type="submit" class="btn btn-danger" id="delete-btn">Delete</button>
+              <button type="submit" class="btn btn-warning" id="suspend-btn">Suspend</button>
+            </div>
+          </div>
+        </div><!-- form horizontal -->
+
+        <div class="form-horizontal">
+          <!-- NAME -->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="customer_name">Username:</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="customer_name" placeholder="Enter a username">
+            </div>
+          </div>
+
+          <!-- FIRST NAME -->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="first_name">First Name:</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="first_name" placeholder="Enter a first name">
+            </div>
+          </div>
+
+          <!-- LAST NAME -->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="last_name">Last Name:</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="last_name" placeholder="Enter a last name">
+            </div>
+          </div>
+
+          <!-- EMAIL -->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="email">Email:</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="email" placeholder="Enter email for Customer">
+            </div>
+          </div>
+
+          <!-- PHONE NUMBER -->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="phone_number">Phone Number:</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="phone_number" placeholder="Enter phone number for Customer">
+            </div>
+          </div>
+
+          <!-- ACCOUNT STATUS -->
+          <div class="form-group">
+            <label class="control-label col-sm-2" for="account_status">Account Status:</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control" id="account_status" placeholder="Enter account status for Customer">
+            </div>
+          </div>
+
+          <!-- SUBMIT BUTTONS -->
+          <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-9">
+              <button type="submit" class="btn btn-success" id="create-btn">Create</button>
+              <button type="submit" class="btn btn-warning" id="update-btn">Update</button>
+              <button type="submit" class="btn btn-info" id="search-btn">Search</button>
+              <button type="submit" class="btn btn-primary" id="clear-btn">Clear</button>
+            </div>
+          </div>
+        </div><!-- form horizontal -->
+      </div><!-- end Form -->
+
+      <!-- Search Results -->
+      <div class="table-responsive col-md-15" id="search_results">
+        <h4>Customer Search Results:</h4>
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th class="col-md-1">ID</th>
+            <th class="col-md-4">Username</th>
+            <th class="col-md-4">First Name</th>
+            <th class="col-md-4">Last Name</th>
+            <th class="col-md-4">Email</th>
+            <th class="col-md-4">Phone</th>
+            <th class="col-md-4">Status</th>
+          </tr>
+          </thead>
+        </table> <!-- end table -->
+      </div>
+      <footer>
+        <br><br>
+        <p>&copy; NYU DevOps Company 2022</p>
+      </footer>
+    </div> <!-- end container -->
+
+    <script type="text/javascript" src="static/js/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="static/js/bootstrap.min.js"></script>
+
+    <!-- YOUR REST API -->
+    <script type="text/javascript" src="static/js/rest_api.js"></script>
+
+  </body>
+</html>
