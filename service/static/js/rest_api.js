@@ -14,21 +14,21 @@ $(function () {
     function update_customer_form_data(res) {
         $("#customer_id").val(res.id);
         $("#customer_name").val(res.name);
-        $("#first_name").val(res.first_name);
-        $("#last_name").val(res.last_name);
-        $("#email").val(res.email);
-        $("#phone_number").val(res.phone_number);
-        $("#account_status").val(res.account_status);
+        $("#customer_first_name").val(res.first_name);
+        $("#customer_last_name").val(res.last_name);
+        $("#customer_email").val(res.email);
+        $("#customer_phone_number").val(res.phone_number);
+        $("#customer_account_status").val(res.account_status);
     };
     /// Clears all form fields
     function clear_customer_form_data() {
         $("#customer_id").val("");
         $("#customer_name").val("");
-        $("#first_name").val("");
-        $("#last_name").val("");
-        $("#email").val("");
-        $("#phone_number").val("");
-        $("#account_status").val("");
+        $("#customer_first_name").val("");
+        $("#customer_last_name").val("");
+        $("#customer_email").val("");
+        $("#customer_phone_number").val("");
+        $("#customer_account_status").val("");
     };
 
     // *******************************************************
@@ -38,11 +38,11 @@ $(function () {
     // *******************************************************
     $("#create-btn").click(function () {
         let name = $("#customer_name").val();
-        let first_name = $("#first_name").val();
-        let last_name = $("#last_name").val();
-        let email = $("#email").val();
-        let phone_number = $("#phone_number").val();
-        let account_status = $("#account_status").val();
+        let first_name = $("#customer_first_name").val();
+        let last_name = $("#customer_last_name").val();
+        let email = $("#customer_email").val();
+        let phone_number = $("#customer_phone_number").val();
+        let account_status = $("#customer_account_status").val();
         let data = {
             "name": name,
             "first_name": first_name,
@@ -73,11 +73,11 @@ $(function () {
     $("#update-btn").click(function () {
         let customer_id = $("#customer_id").val();
         let name = $("#customer_name").val();
-        let first_name = $("#first_name").val();
-        let last_name = $("#last_name").val();
-        let email = $("#email").val();
-        let phone_number = $("#phone_number").val();
-        let account_status = $("#account_status").val();
+        let first_name = $("#customer_first_name").val();
+        let last_name = $("#customer_last_name").val();
+        let email = $("#customer_email").val();
+        let phone_number = $("#customer_phone_number").val();
+        let account_status = $("#customer_account_status").val();
         let data = {
             "name": name,
             "first_name": first_name,
@@ -156,9 +156,9 @@ $(function () {
     $("#search-btn").click(function () {
         let id = $("#customer_id").val();
         let name = $("#customer_name").val();
-        let last_name = $("#last_name").val();
-        let first_name = $("#first_name").val();
-        let email = $("#email").val();
+        let last_name = $("#customer_last_name").val();
+        let first_name = $("#customer_first_name").val();
+        let email = $("#customer_email").val();
         //let phone_number = $("#phone_number").val();
         let queryString = "";
         if (id) {
@@ -223,10 +223,10 @@ $(function () {
     // *******************************************************
     $("#suspend-btn").click(function () {
         let name = $("#customer_name").val();
-        let first_name = $("#first_name").val();
-        let last_name = $("last_name").val();
-        let email = $("#email").val();
-        let phone_number = $("#phone_number").val();
+        let first_name = $("#customer_first_name").val();
+        let last_name = $("#customer_last_name").val();
+        let email = $("#customer_email").val();
+        let phone_number = $("#customer_phone_number").val();
         let data = {
             "name": name,
             "first_name": first_name,
