@@ -14,18 +14,17 @@ def step_impl(context):
     for customer in context.resp.json():
         context.resp = requests.delete(context.base_url + '/customers/' + str(customer["customer_id"]), headers=headers)
         expect(context.resp.status_code).to_equal(204)
-
+    
     # load the database with new customers
     create_url = context.base_url + '/customers'
     for row in context.table:
         data = {
             #"customer_id": row["customer_id"],
-            "firstname": row['firstname'],
-            "lastname": row['lastname'],
-            "email_id": row['email_id'],
-            "address": row['address'],
+            "first_name": row['firstname'],
+            "last_name": row['lastname'],
+            "email": row['email'],
             "phone_number": row['phone_number'],
-            "active": row['active'] in ['True', 'true', '1']
+            "account_status": row['account_status']
             }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
