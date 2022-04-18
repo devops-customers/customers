@@ -24,7 +24,6 @@ def step_impl(context):
             "last_name": row['lastname'],
             "email": row['email'],
             "phone_number": row['phone_number'],
-            "account_status": row['account_status']
             }
         payload = json.dumps(data)
         context.resp = requests.post(create_url, data=payload, headers=headers)
