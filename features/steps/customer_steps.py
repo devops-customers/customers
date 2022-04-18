@@ -1,7 +1,7 @@
 import os
+import json
 import requests
 from behave import given, when, then
-import json
 from compare import expect
 
 @given('the following customers')
@@ -25,7 +25,6 @@ def step_impl(context):
             "email_id": row['email_id'],
             "address": row['address'],
             "phone_number": row['phone_number'],
-            "card_number": row['card_number'],
             "active": row['active'] in ['True', 'true', '1']
             }
         payload = json.dumps(data)
