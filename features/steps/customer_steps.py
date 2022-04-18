@@ -12,7 +12,7 @@ def step_impl(context):
     context.resp = requests.get(context.base_url + '/customers', headers=headers)
     expect(context.resp.status_code).to_equal(200)
     for customer in context.resp.json():
-        context.resp = requests.delete(context.base_url + '/customers/' + str(customer["customer_id"]), headers=headers)
+        context.resp = requests.delete(context.base_url + '/customers/' + str(customer["id"]), headers=headers)
         expect(context.resp.status_code).to_equal(204)
     
     # load the database with new customers
