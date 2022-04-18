@@ -1,5 +1,5 @@
 # Image for a Python 3 development environment
-FROM python:3.9-slim
+FROM rofrano/pipeline-selenium:latest
 
 # # For Feiyang to speed up
 # Run sed -i 's/deb.debian.org/mirrors.tencent.com/' /etc/apt/sources.list
