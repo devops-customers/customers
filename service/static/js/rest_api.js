@@ -167,11 +167,11 @@ $(function () {
         if (name) {
             queryString += '?name=' + name
         };
-        if (last_name) {
-            queryString += '?last_name=' + last_name
-        };
         if (first_name) {
             queryString += '?first_name=' + first_name
+        };
+        if (last_name) {
+            queryString += '?last_name=' + last_name
         };
         if (email) {
             queryString += '?email=' + email
@@ -210,7 +210,7 @@ $(function () {
             $("#search_results").append(table);
             // copy the first result to the form
             if (firstCustomer != "") {
-                update_form_data(firstCustomer);
+                update_customer_form_data(firstCustomer)
             };
             flash_message("Success");
         });
