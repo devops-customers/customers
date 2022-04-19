@@ -6,7 +6,9 @@ Feature: The customers service back-end
 Background:
     Given the following customers
     | name       | first_name  | last_name   | email           | phone_number    | account_status   |  addresses  |
-    | annie123   | Annie       | Banana      | 123@gmail.com   | 6513466036      | active             |             |
+    | annie123   | Annie       | Banana      | 123@gmail.com   | 6513466036      | active           |             | 
+    | roger123   | Roger       | Date        | 456@gmail.com   | 6561234567      | active           |             |
+    | maya12 3   | Maya        | Orange      | 123@gmail.com   | 6562345678      | active          |             |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -62,3 +64,10 @@ Scenario: Update Customer
     And I press the "Search" button
     Then I should see "6513460000" in the "phone_number" field
     And I should not see "6513466036" in the results
+
+Scenario: List all Active Customers
+    When I visit the "Home Page"
+    And I press the "Search" button
+    Then I should see "Annie" in the results
+    And I should see "Roger" in the results
+    And I should see "Maya" in the results
