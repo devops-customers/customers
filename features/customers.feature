@@ -5,8 +5,8 @@ Feature: The customers service back-end
 
 Background:
     Given the following customers
-        | name       | first_name | last_name | email           | phone_number | account_status | addresses |
-        | cj123      | Carole     | Jordan    | cj123@email.com | 1234567890   | active         |           |
+    | name       | first_name  | last_name   | email           | phone_number    | account_status   |  addresses  |
+    | annie123   | Annie       | Banana      | 123@gmail.com   | 6513466036      | active             |             |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -40,3 +40,25 @@ Scenario: Create a Customer
     Then I should see "6513466036" in the "phone number" field
     Then I should see "active" in the "account status" field
 
+Scenario: Update Customer
+    When I visit the "Home Page"
+    And I set the "first_name" to "Annie"
+    And I press the "search" button
+    Then I should see "Annie" in the "first_name" field
+    And I should see "Banana" in the "last_name" field
+    And I should see "123@gmail.com" in the "email" field
+    And I should see "6513466036" in the "phone_number" field
+    Then I should see "active" in the "account_status" field
+    When I change "phone_number" to "6513460000"
+    And I press the "Update" button
+    Then I should see the message "Success"
+    When I copy the "id" field
+    And I press the "Clear" button
+    And I paste the "id" field
+    And I press the "Retrieve" button
+    Then I should see "6513460000" in the "phone_number" field
+    When I press the "Clear" button
+    And I set the "first_name" to "Annie"
+    And I press the "Search" button
+    Then I should see "6513460000" in the "phone_number" field
+    And I should not see "6513466036" in the results
