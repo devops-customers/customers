@@ -6,7 +6,7 @@ Feature: The customers service back-end
 Background:
     Given the following customers
     | name       | first_name  | last_name   | email           | phone_number    | account_status   |  addresses  |
-    | annie123   | Annie       | Banana      | 123@gmail.com   | 6513466036      | True             |             |
+    | annie123   | Annie       | Banana      | 123@gmail.com   | 6513466036      | active             |             |
 
 Scenario: The server is running
     When I visit the "Home Page"
