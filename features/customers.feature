@@ -5,7 +5,8 @@ Feature: The customers service back-end
 
 Background:
     Given the following customers
-        | firstname   | lastname   | email  | phone_number   | account_status
+        | firstname   | lastname   | email           | phone_number     | account_status
+        | Annie       | Banana     | 123@gmail.com   | 6513466036       | True
 
 Scenario: The server is running
     When I visit the "Home Page"
