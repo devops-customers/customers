@@ -8,7 +8,7 @@ Background:
     | name       | first_name  | last_name   | email           | phone_number    | account_status   |  addresses  |
     | annie123   | Annie       | Banana      | 123@gmail.com   | 6513466036      | active           |             | 
     | roger123   | Roger       | Date        | 456@gmail.com   | 6561234567      | active           |             |
-    | maya12 3   | Maya        | Orange      | 123@gmail.com   | 6562345678      | active          |             |
+    | maya12 3   | Maya        | Orange      | 123@gmail.com   | 6562345678      | active           |             |
 
 Scenario: The server is running
     When I visit the "Home Page"
@@ -71,3 +71,12 @@ Scenario: List all Active Customers
     Then I should see "Annie" in the results
     And I should see "Roger" in the results
     And I should see "Maya" in the results
+
+Scenario: Delete a Customer
+    When I visit the "Home Page"
+    And I press the "Search" button
+    And I copy the "id" field
+    And I press the "Clear" button
+    And I paste the "id" field
+    And I press the "Delete" button
+    Then I should see the message "Customer has been Deleted!"
