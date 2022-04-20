@@ -80,3 +80,37 @@ Scenario: Delete a Customer
     And I paste the "id" field
     And I press the "Delete" button
     Then I should see the message "Customer has been Deleted!"
+
+Scenario: Query customers by first name
+    When I visit the "Home Page"
+    And I set the "first_name" to "Annie"
+    And I press the "Search" button
+    Then I should see "Annie" in the results
+    And I should not see "Roger" in the results
+    And I should not see "Maya" in the results
+
+Scenario: Query customers by last name
+    When I visit the "Home Page"
+    And I set the "last_name" to "Banana"
+    And I press the "Search" button
+    Then I should see "Banana" in the results  
+    And I should not see "Date" in the results
+    And I should not see "Orange" in the results
+
+
+Scenario: Query customers by email_id
+    When I visit the "Home Page"
+    And I set the "email" to "123@gmail.com"
+    And I press the "Search" button
+    Then I should see "123@gmail.com" in the "email" field
+    And I should see "Annie" in the "first_name" field
+    And I should see "Banana" in the "last_name" field
+    And I should not see "456@gmail.com" in the results
+
+Scenario: Query customers by active status
+    When I visit the "Home Page"
+    And I set the "account_status" to "active"
+    And I press the "Search" button
+    Then I should see "Annie" in the results
+    And I should see "Roger" in the results
+    And I should see "Maya" in the results
