@@ -222,6 +222,7 @@ $(function () {
     // Suspend a customer
     // *******************************************************
     $("#suspend-btn").click(function () {
+        let customer_id = $("#customer_id").val();
         let name = $("#customer_name").val();
         let first_name = $("#customer_first_name").val();
         let last_name = $("#customer_last_name").val();
@@ -239,7 +240,7 @@ $(function () {
         $("#flash_message").empty();
         let ajax = $.ajax({
                 type: "PUT",
-                url: `/customers/${order_id}/suspend`,
+                url: `/customers/${customer_id}/suspend`,
                 contentType: "application/json",
                 data: JSON.stringify(data)
             });
