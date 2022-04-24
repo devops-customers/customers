@@ -42,10 +42,20 @@ Scenario: Create a Customer
     Then I should see "6513466036" in the "phone number" field
     Then I should see "active" in the "account status" field
 
+Scenario: Read a Customer
+    When I visit the "Home Page"
+    And I set the "first_name" to "Annie"
+    And I press the "Search" button
+    Then I should see "Annie" in the "first_name" field
+    And I should see "Banana" in the "last_name" field
+    And I should see "123@gmail.com" in the "email" field
+    And I should see "6513466036" in the "phone_number" field
+    Then I should see "active" in the "account_status" field
+
 Scenario: Update Customer
     When I visit the "Home Page"
     And I set the "first_name" to "Annie"
-    And I press the "search" button
+    And I press the "Search" button
     Then I should see "Annie" in the "first_name" field
     And I should see "Banana" in the "last_name" field
     And I should see "123@gmail.com" in the "email" field
@@ -113,4 +123,4 @@ Scenario: Query customers by active status
     And I press the "Search" button
     Then I should see "Annie" in the results
     And I should see "Roger" in the results
-    And I should see "Maya" in the results
+    And I should see "Maya" in the results  
