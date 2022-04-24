@@ -56,7 +56,7 @@ Scenario: Read a Customer
 Scenario: Update Customer
     When I visit the "Home Page"
     And I set the "first_name" to "Annie"
-    And I press the "search" button
+    And I press the "Search" button
     Then I should see "Annie" in the "first_name" field
     And I should see "Banana" in the "last_name" field
     And I should see "123@gmail.com" in the "email" field
