@@ -252,4 +252,38 @@ $(function () {
         });
     });
 
+    // *******************************************************
+    // Restore a customer
+    // *******************************************************
+    $("#restore-btn").click(function () {
+        let customer_id = $("#customer_id").val();
+        let name = $("#customer_name").val();
+        let first_name = $("#customer_first_name").val();
+        let last_name = $("#customer_last_name").val();
+        let email = $("#customer_email").val();
+        let phone_number = $("#customer_phone_number").val();
+        let data = {
+            "name": name,
+            "first_name": first_name,
+            "last_name": last_name,
+            "email": email,
+            "phone_number": phone_number,
+            "addresses": "",
+            "account_status": "suspended"
+        };
+        $("#flash_message").empty();
+        let ajax = $.ajax({
+                type: "PUT",
+                url: `/customers/${customer_id}/restore`,
+                contentType: "application/json",
+                data: JSON.stringify(data)
+            });
+        ajax.done(function(res){
+            update_form_data("Success");
+        });
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message);
+        });
+    });
+
 });

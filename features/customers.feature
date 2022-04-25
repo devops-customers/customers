@@ -150,11 +150,13 @@ Scenario: Activate customer by Id
     And I press the "Search" button
     Then I should see "Annie" in the "first_name" field
     Then I should see "suspended" in the "account_status" field
-    When I change "account_status" to "active"
-    And I press the "Update" button
-    Then I should see the message "Success"
-    When I copy the "id" field
-    And I press the "Clear" button
-    And I paste the "id" field
-    And I press the "Retrieve" button
+    
+    When I visit the "Home Page"
+    And I set the "first_name" to "Annie"
+    And I press the "Search" button
+    And I press the "Restore" button
+    When I visit the "Home Page"
+    And I set the "first_name" to "Annie"
+    And I press the "Search" button
+    Then I should see "Annie" in the "first_name" field
     Then I should see "active" in the "account status" field
