@@ -138,3 +138,25 @@ Scenario: Suspend customer by Id
     And I should see "123@gmail.com" in the "email" field
     And I should see "6513466036" in the "phone_number" field
     Then I should see "suspended" in the "account_status" field
+
+
+Scenario: Activate customer by Id
+    When I visit the "Home Page"
+    And I set the "first_name" to "Annie"
+    And I press the "Search" button
+    And I press the "Suspend" button
+    When I visit the "Home Page"
+    And I set the "first_name" to "Annie"
+    And I press the "Search" button
+    Then I should see "Annie" in the "first_name" field
+    Then I should see "suspended" in the "account_status" field
+    
+    When I visit the "Home Page"
+    And I set the "first_name" to "Annie"
+    And I press the "Search" button
+    And I press the "Restore" button
+    When I visit the "Home Page"
+    And I set the "first_name" to "Annie"
+    And I press the "Search" button
+    Then I should see "Annie" in the "first_name" field
+    Then I should see "active" in the "account status" field
