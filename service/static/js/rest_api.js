@@ -49,7 +49,7 @@ $(function () {
             "last_name": last_name,
             "email": email,
             "phone_number": phone_number,
-            "addresses": "",
+            "addresses": [],
             "account_status": account_status
         };
         $("#flash_message").empty();
@@ -84,7 +84,7 @@ $(function () {
             "last_name": last_name,
             "email": email,
             "phone_number": phone_number,
-            "addresses": "",
+            "addresses": [],
             "account_status": account_status
         };
         $("#flash_message").empty();
@@ -234,7 +234,7 @@ $(function () {
             "last_name": last_name,
             "email": email,
             "phone_number": phone_number,
-            "addresses": "",
+            "addresses": [],
             "account_status": "suspended"
         };
         $("#flash_message").empty();
@@ -268,7 +268,7 @@ $(function () {
             "last_name": last_name,
             "email": email,
             "phone_number": phone_number,
-            "addresses": "",
+            "addresses": [],
             "account_status": "suspended"
         };
         $("#flash_message").empty();
