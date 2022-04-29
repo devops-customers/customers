@@ -48,6 +48,7 @@ class TestCustomerModel(unittest.TestCase):
         """This runs once before the entire test suite"""
         app.config["TESTING"] = True
         app.config["DEBUG"] = False
+        app.config["SQLALCHEMY_POOL_SIZE"] = 2
         app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URI
         app.logger.setLevel(logging.CRITICAL)
         Customer.init_db(app)
@@ -69,25 +70,25 @@ class TestCustomerModel(unittest.TestCase):
 
     ######################################################################
     #  H E L P E R   M E T H O D S
-    ###################################################################### 
+    ######################################################################
 
     def _create_customer(self, addresses=[]):
         """ Creates a Customer from a Factory """
         fake_customer = CustomerFactory()
         customer = Customer(
-            name = fake_customer.name,
-            first_name = fake_customer.first_name,
-            last_name = fake_customer.last_name, 
-            email = fake_customer.email,
-            phone_number = fake_customer.phone_number,
-            addresses = addresses
+            name=fake_customer.name,
+            first_name=fake_customer.first_name,
+            last_name=fake_customer.last_name,
+            email=fake_customer.email,
+            phone_number=fake_customer.phone_number,
+            addresses=addresses
         )
         self.assertTrue(customer != None)
         self.assertEqual(customer.id, None)
-        return customer 
+        return customer
 
     def _create_address(self):
-        """ Creates fake address from factory """ 
+        """ Creates fake address from factory """
         fake_address = AddressFactory()
         address = Address(
             name=fake_address.name,
@@ -108,11 +109,11 @@ class TestCustomerModel(unittest.TestCase):
         """ Create a Customer and assert that it exists """
         fake_customer = CustomerFactory()
         customer = Customer(
-            name = fake_customer.name,
-            first_name = fake_customer.first_name,
-            last_name = fake_customer.last_name, 
-            email = fake_customer.email,
-            phone_number = fake_customer.phone_number
+            name=fake_customer.name,
+            first_name=fake_customer.first_name,
+            last_name=fake_customer.last_name,
+            email=fake_customer.email,
+            phone_number=fake_customer.phone_number
         )
         self.assertTrue(customer != None)
         self.assertEqual(customer.id, None)
@@ -131,7 +132,7 @@ class TestCustomerModel(unittest.TestCase):
         # Assert that it was assigned an id and shows up in the database
         self.assertEqual(customer.id, 1)
         customers = Customer.all()
-        self.assertEqual(len(customers),1)
+        self.assertEqual(len(customers), 1)
 
     def test_read_customer(self):
         """ Read a customer """
@@ -187,7 +188,7 @@ class TestCustomerModel(unittest.TestCase):
             customer.create()
         # Assert that there are now 5 customers in the database
         customers = Customer.all()
-        self.assertEqual(len(customers),5)
+        self.assertEqual(len(customers), 5)
 
     def test_find_or_404(self):
         """ Find or throw 404 error """
@@ -250,7 +251,8 @@ class TestCustomerModel(unittest.TestCase):
         self.assertEqual(serial_customer['first_name'], customer.first_name)
         self.assertEqual(serial_customer['last_name'], customer.last_name)
         self.assertEqual(serial_customer['email'], customer.email)
-        self.assertEqual(serial_customer['phone_number'], customer.phone_number)
+        self.assertEqual(
+            serial_customer['phone_number'], customer.phone_number)
         self.assertEqual(len(serial_customer['addresses']), 1)
         addresses = serial_customer['addresses']
         self.assertEqual(addresses[0]['id'], address.id)
@@ -262,7 +264,7 @@ class TestCustomerModel(unittest.TestCase):
         self.assertEqual(addresses[0]['postalcode'], address.postalcode)
 
     def test_deserialize_a_customer(self):
-        """ Deserialize a customer """ 
+        """ Deserialize a customer """
         address = self._create_address()
         customer = self._create_customer(addresses=[address])
         serial_customer = customer.serialize()
@@ -305,7 +307,7 @@ class TestCustomerModel(unittest.TestCase):
         # Assert that it was assigned an id and shows up in the database
         self.assertEqual(customer.id, 1)
         customers = Customer.all()
-        self.assertEqual(len(customers),1)
+        self.assertEqual(len(customers), 1)
 
         new_customer = Customer.find(customer.id)
         self.assertEqual(new_customer.addresses[0].name, address.name)
@@ -329,7 +331,7 @@ class TestCustomerModel(unittest.TestCase):
         # Assert that it was assigned an id and shows up in the database
         self.assertEqual(customer.id, 1)
         customers = Customer.all()
-        self.assertEqual(len(customers),1)
+        self.assertEqual(len(customers), 1)
 
         # Fetch it back
         customer = Customer.find(customer.id)
@@ -355,7 +357,7 @@ class TestCustomerModel(unittest.TestCase):
         # Assert that it was assigned an id and shows up in the database
         self.assertEqual(customer.id, 1)
         customers = Customer.all()
-        self.assertEqual(len(customers),1)
+        self.assertEqual(len(customers), 1)
 
         # Fetch it back
         customer = Customer.find(customer.id)
@@ -365,7 +367,7 @@ class TestCustomerModel(unittest.TestCase):
 
         # Fetch it back again
         customer = Customer.find(customer.id)
-        self.assertEqual(len(customer.addresses),0)
+        self.assertEqual(len(customer.addresses), 0)
 
     def test_find_by_street(self):
         """ Find by street address """
