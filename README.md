@@ -153,7 +153,7 @@ Where `ORG` is your cloud foundry org and `SPACE` is your cloud foundry space
 As an example:
 
 ```bash
-ibmcloud target -o llb6986@nyu.edu -s dev
+ibmcloud target -o jmy5844@nyu.edu -s dev
 ```
 
 #### List resources
