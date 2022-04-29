@@ -29,7 +29,7 @@ from .factories import CustomerFactory, AddressFactory
 DATABASE_URI = os.getenv(
     "DATABASE_URI", "postgresql://postgres:postgres@localhost:5432/testdb"
 )
-BASE_URL = "/customers"
+BASE_URL = "/https://nyu-customer-service-sp2201.us-south.cf.appdomain.cloud/"
 CONTENT_TYPE_JSON = "application/json"
 
 
