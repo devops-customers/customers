@@ -1,6 +1,6 @@
 # Customer REST API for NYU DevOps
 
-[![Build Status](https://github.com/devops-customers/customers/.github/workflows/tdd.yml/badge.svg)](https://github.com/devops-customers/customers/actions)
+[![Build Status](https://github.com/devops-customers/customers/actions/.github/workflows/tdd.yml/badge.svg)](https://github.com/devops-customers/customers/actions)
 [![codecov](https://codecov.io/gh/devops-customers/customers/branch/main/graph/badge.svg?token=W0KHFZOJ4B)](https://codecov.io/gh/devops-customers/customers)
 
 ## Structure of Customers App
