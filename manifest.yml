@@ -1,7 +1,7 @@
 ---
 # This manifest deploys a Python Flask application with a Cloudant database
 applications:
-- name: customers
+- name: nyu-customer-service-sp2201
   path: .
   instances: 1
   memory: 128M
