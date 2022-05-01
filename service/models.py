@@ -28,12 +28,19 @@ last name
 email
 phone number
 """
+import os
 import logging
-#from enum import Enum
+from retry import retry
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from requests import HTTPError, ConnectionError
 
 logger = logging.getLogger("flask.app")
+
+# global variables for retry (must be int)
+RETRY_COUNT = int(os.environ.get("RETRY_COUNT", 10))
+RETRY_DELAY = int(os.environ.get("RETRY_DELAY", 1))
+RETRY_BACKOFF = int(os.environ.get("RETRY_BACKOFF", 2))
 
 # Create the SQLAlchemy object to be initialized later in init_db()
 db = SQLAlchemy()
@@ -41,57 +48,53 @@ db = SQLAlchemy()
 def init_db(app):
     """Initialize the SQLAlchemy app"""
     Customer.init_db(app)
+    Address.init_db(app)
 
+class DatabaseConnectionError(Exception):
+    """ Custom exception when database connection fails"""
 
 class DataValidationError(Exception):
     """Used for an data validation errors when deserializing"""
+    pass
 
 ######################################################################
 #  P E R S I S T E N T   B A S E   M O D E L
 ######################################################################
 class PersistentBase():
-    """ 
-   Base class added persistent methods
-    """
+    """ Base class added persistent methods """
 
     def create(self):
         """ 
-        Creates an Account to the database
+        Creates a Customer to the database
         """
-        logger.info("Creating %s", self.name)
+        logger.info("Creating %s", self.id)
         self.id = None  # id must be none to generate next primary key
         db.session.add(self)
         db.session.commit()
 
-    def save(self):
+    def update(self):
         """ 
         Updates a Customer to the database
         """
-        logger.info("Saving %s", self.name)
-        db.session.commit()
-
-    def update(self):
-        """ 
-        Updates an Account to the database
-        """
-        logger.info("Updating %s", self.name)
-        #if not self.id:
-        #    raise DataValidationError("Update called with empty ID field")
+        logger.info("Saving %s", self.id)
         db.session.commit()
 
     def delete(self):
         """ 
         Removes an Account from the data store 
         """
-        logger.info("Deleting %s", self.name)
+        logger.info("Deleting %s", self.id)
         db.session.delete(self)
         db.session.commit()
 
-    ##################################################
-    # CLASS METHODS
-    ##################################################
-
     @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def init_db(cls, app: Flask):
         """Initializes the database session
 
@@ -107,12 +110,38 @@ class PersistentBase():
         db.create_all()  # make our sqlalchemy tables
 
     @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
+    def remove_all(cls):
+        """ Removes all documents from the database (use for testing) """
+        db.drop_all()
+
+    @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def all(cls) -> list:
         """Returns all of the Customers in the database"""
         logger.info("Processing all Records")
         return cls.query.all()
 
     @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find(cls, by_id: int):
         """ Finds a Record by it's ID
 
@@ -126,13 +155,37 @@ class PersistentBase():
         logger.info("Processing lookup for id %s ...", by_id)
         return cls.query.get(by_id)
 
+    @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
+    def find_or_404(cls, customer_id: int):
+        """Find a Customer by it's id or 404
+        
+        :param id: the id of the Customer to find
+        :type id: int
+
+        :return: an instance with the id, or 404_NOT_FOUND if not found
+        :rtype: Customer
+        """
+        logger.info("Processing lookup or 404 for id %s...", customer_id)
+        return cls.query.get_or_404(customer_id)
+
 ######################################################################
 #  A D D R E S S   M O D E L
 ######################################################################
 class Address(db.Model, PersistentBase):
+    """ 
+    Class that represents Customer Addresses
+    
+    This version uses a relational database for persistence which is hidden
+    from us by SQLAlchemy's object relational mappings (ORM)
     """
-    Class that represents an Item
-    """
+
     ##################################################
     # Table Schema
     ##################################################
@@ -187,14 +240,15 @@ class Address(db.Model, PersistentBase):
         return self
 
 ######################################################################
-#  A C C O U N T   M O D E L
+#  C U S T O M E R   M O D E L
 ######################################################################
 class Customer(db.Model, PersistentBase):
     """ 
     Class that represents a Customer
+    
+    This version uses a relational database for persistence which is hidden
+    from us by SQLAlchemy's object relational mappings (ORM)
     """
-
-    app = None
 
     ##################################################
     # Table Schema
@@ -204,15 +258,13 @@ class Customer(db.Model, PersistentBase):
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
     email = db.Column(db.String(64))
-    phone_number = db.Column(
-        db.String(32), nullable=True)  # phone # is optional
-    addresses = db.relationship('Address', backref='customer', lazy=True)
+    phone_number = db.Column(db.String(32), nullable=True)  # phone # is optional
     account_status = db.Column(db.String(64)) #create a column for customer status
+    addresses = db.relationship('Address', backref='customer', lazy=True)
 
     ##################################################
     # INSTANCE METHODS
     ##################################################
-
     def __repr__(self):
         return "<Customer %r id=[%s]>" % (self.name, self.id)
 
@@ -225,8 +277,8 @@ class Customer(db.Model, PersistentBase):
             "last_name": self.last_name,
             "email": self.email,
             "phone_number": self.phone_number,
-            "addresses": [],
-            "account_status": self.account_status
+            "account_status": self.account_status,
+            "addresses": []
         }
         for address in self.addresses:
             customer['addresses'].append(address.serialize())
@@ -235,7 +287,6 @@ class Customer(db.Model, PersistentBase):
     def deserialize(self, data: dict):
         """ 
         Deserializes a Customer from a dictionary
-
         Args:
             data (dict): A dictionary containing the resource data
         """
@@ -245,13 +296,13 @@ class Customer(db.Model, PersistentBase):
             self.last_name = data["last_name"]
             self.email = data["email"]
             self.phone_number = data.get("phone_number")
+            self.account_status = data["account_status"]
             # handle inner list of addresses
             address_list = data.get("addresses")
             for json_address in address_list:
                 address = Address()
                 address.deserialize(json_address)
                 self.addresses.append(address)
-            self.account_status = data["account_status"]
         except KeyError as error:
             raise DataValidationError(
                 "Invalid Customer: missing " + error.args[0])
@@ -260,22 +311,15 @@ class Customer(db.Model, PersistentBase):
                 "Invalid Customer body of request contained bad or no data"
             )
         return self
-
-    @classmethod
-    def find_or_404(cls, customer_id: int):
-        """ Find a Customer by it's ID
-
-        :param customer_id: the id of the Customer to find
-        :type customer_id: int
-
-        :return: an instance with the customer_id or 404_NOT_FOUND if not fonud
-        :rtype: Customer
-
-        """
-        logger.info("Processing lookup or 404 for id %s ...", customer_id)
-        return cls.query.get_or_404(customer_id)
     
     @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_name(cls, name: str) -> list:
         """ Returns all Customers with the given last name
 
@@ -290,20 +334,13 @@ class Customer(db.Model, PersistentBase):
         return cls.query.filter(cls.name == name)
 
     @classmethod
-    def find_by_last_name(cls, last_name: str) -> list:
-        """ Returns all Customers with the given last name
-
-        :param last_name: the last name of the Customers you want to match
-        :type last_name: str
-
-        :return: a collection of Customers with that last name
-        :rtype: list
-
-        """
-        logger.info("Processing last name query for %s ...", last_name)
-        return cls.query.filter(cls.last_name == last_name)
-
-    @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_first_name(cls, first_name: str) -> list:
         """ Returns all Customers with the given first name
 
@@ -318,6 +355,33 @@ class Customer(db.Model, PersistentBase):
         return cls.query.filter(cls.first_name == first_name)
 
     @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
+    def find_by_last_name(cls, last_name: str) -> list:
+        """ Returns all Customers with the given last name
+
+        :param last_name: the last name of the Customers you want to match
+        :type last_name: str
+
+        :return: a collection of Customers with that last name
+        :rtype: list
+        """
+        logger.info("Processing last name query for %s ...", last_name)
+        return cls.query.filter(cls.last_name == last_name)
+
+    @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_email(cls, email: str) -> list:
         """ Returns all Customers with the given email
 
@@ -326,12 +390,18 @@ class Customer(db.Model, PersistentBase):
 
         :return: a collection of Customers with that first name
         :rtype: list
-
         """
         logger.info("Processing email query for %s ...", email)
         return cls.query.filter(cls.email == email)
 
     @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_phone_number(cls, phone_number: str) -> list:
         """ Returns all Customers with the given phone_number
 
@@ -340,12 +410,18 @@ class Customer(db.Model, PersistentBase):
 
         :return: a collection of Customers with that phone_number
         :rtype: list
-
         """
         logger.info("Processing phone_number query for %s ...", phone_number)
         return cls.query.filter(cls.phone_number == phone_number)
 
     @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_street(cls, street: str) -> list:
         """ Returns all Customers with the given addess
         """
@@ -354,6 +430,13 @@ class Customer(db.Model, PersistentBase):
         return q.all()
     
     @classmethod
+    @retry(
+        HTTPError, 
+        delay=RETRY_DELAY,
+        backoff=RETRY_BACKOFF,
+        tries=RETRY_COUNT,
+        logger=logger,
+    )
     def find_by_postalcode(cls, postalcode: str) -> list:
         """ Returns all customers with an address in the given zip code """
         logger.info("Processing postal code query for %s ...", postalcode)
