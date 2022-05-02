@@ -345,16 +345,16 @@ class CustomerAddressResource(Resource):
     @api.doc('get_addresses')
     @api.response(404, 'Address not found')
     @api.marshal_with(address_model)
-    def get(self, customer_id, id):
+    def get(self, customer_id, address_id):
         """ 
         Get a Customer Address
 
         This endpoint will return an address based on its id and its customers's id
         """
-        app.logger.info("Request to retrieve Customer Address %s for Customer id %s", (id, customer_id))
-        address = Address.find(id)
+        app.logger.info("Request to retrieve Customer Address %s for Customer id %s", (address_id, customer_id))
+        address = Address.find(address_id)
         if not address:
-            abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{id}' could not be found.")
+            abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{customer_id}' and address is '{address_id}' could not be found.")
         
         return address.serialize(), status.HTTP_200_OK
 
@@ -366,21 +366,21 @@ class CustomerAddressResource(Resource):
     @api.response(400, 'The posted Address data was not valid')
     @api.expect(address_model)
     @api.marshal_with(address_model)
-    def put(self, customer_id, id):
+    def put(self, customer_id, address_id):
         """ 
         Update an Address
         
         This endpoint will update an Address based on the body that is posted
         """
-        app.logger.info("Request to update Address %s for Customer id: %s", (id, customer_id))
+        app.logger.info("Request to update Address %s for Customer id: %s", (address_id, customer_id))
         check_content_type("application/json")
 
-        address = Address.find(id)
+        address = Address.find(address_id)
         if not address:
-            abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{id}' could not be found.")
+            abort(status.HTTP_404_NOT_FOUND, f"Customer with id '{customer_id}' and address '{address_id}' could not be found.")
         
         address.deserialize(api.payload)
-        address.id = id
+        address.id = address_id
         address.update()
         return address.serialize(), status.HTTP_200_OK
 
@@ -389,15 +389,15 @@ class CustomerAddressResource(Resource):
     # ------------------------------------------------------------------
     @api.doc('delete_addresses')
     @api.response(204, 'Customer Address deleted')
-    def delete(self, customer_id, id):
+    def delete(self, customer_id, address_id):
         """ 
         Delete an Address
         
         This endpoint will delete an Item based on the id specified in the path
         """
-        app.logger.info("Request to delete Address %s for Customer id: %s", (id, customer_id))
+        app.logger.info("Request to delete Address %s for Customer id: %s", (address_id, customer_id))
 
-        address = Address.find(id)
+        address = Address.find(address_id)
         if address:
             address.delete()
 
