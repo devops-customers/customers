@@ -32,6 +32,10 @@ DATABASE_URI = os.getenv(
 BASE_URL = "/customers"
 CONTENT_TYPE_JSON = "application/json"
 
+# override if we are running in Cloud Foundry
+if 'VCAP_SERVICES' in os.environ:
+    vcap = json.loads(os.environ['VCAP_SERVICES'])
+    DATABASE_URI = vcap['user-provided'][0]['credentials']['url']
 
 ######################################################################
 #  T E S T   C A S E S
