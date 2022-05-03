@@ -245,7 +245,7 @@ $(function () {
                 data: JSON.stringify(data)
             });
         ajax.done(function(res){
-            update_form_data("Success");
+            flash_message("Success");
         });
         ajax.fail(function(res){
             flash_message(res.responseJSON.message);
@@ -279,7 +279,7 @@ $(function () {
                 data: JSON.stringify(data)
             });
         ajax.done(function(res){
-            update_form_data("Success");
+            flash_message("Success");
         });
         ajax.fail(function(res){
             flash_message(res.responseJSON.message);
