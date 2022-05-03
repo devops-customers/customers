@@ -108,7 +108,7 @@ Scenario: Query customers by last name
     And I should not see "Orange" in the results
 
 
-Scenario: Query customers by email_id
+Scenario: Query customers by email
     When I visit the "Home Page"
     And I set the "email" to "123@gmail.com"
     And I press the "Search" button
@@ -125,37 +125,35 @@ Scenario: Query customers by active status
     And I should see "Roger" in the results
     And I should see "Maya" in the results  
 
-Scenario: Suspend customer by Id
+Scenario: Suspend customer
     When I visit the "Home Page"
     And I set the "first_name" to "Annie"
     And I press the "Search" button
     And I press the "Suspend" button
-    When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "first_name" to "Annie"
     And I press the "Search" button
     Then I should see "Annie" in the "first_name" field
     And I should see "Banana" in the "last_name" field
     And I should see "123@gmail.com" in the "email" field
     And I should see "6513466036" in the "phone_number" field
-    Then I should see "suspended" in the "account_status" field
+    And I should see "suspended" in the "account_status" field
 
-
-Scenario: Activate customer by Id
+Scenario: Activate customer
     When I visit the "Home Page"
     And I set the "first_name" to "Annie"
     And I press the "Search" button
     And I press the "Suspend" button
-    When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "first_name" to "Annie"
     And I press the "Search" button
     Then I should see "Annie" in the "first_name" field
     Then I should see "suspended" in the "account_status" field
-    
     When I visit the "Home Page"
     And I set the "first_name" to "Annie"
     And I press the "Search" button
     And I press the "Restore" button
-    When I visit the "Home Page"
+    And I press the "Clear" button
     And I set the "first_name" to "Annie"
     And I press the "Search" button
     Then I should see "Annie" in the "first_name" field
