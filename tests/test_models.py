@@ -160,7 +160,7 @@ class TestCustomerModel(unittest.TestCase):
         # Fetch it back
         customer = Customer.find(customer.id)
         customer.email = "XXX@YYY.COM"
-        customer.save()
+        customer.update()
 
         # Fetch it back again
         customer = Customer.find(customer.id)
