@@ -52,6 +52,12 @@ def index():
     #)
     return app.send_static_file("index.html")
 
+######################################################################
+# CREATE PAGE FOR ADDRESS UI
+######################################################################
+@app.route("/address")
+def address():
+    return app.send_static_file("address.html")
 
 ######################################################################
 # LIST ALL CUSTOMERS

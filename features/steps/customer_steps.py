@@ -32,9 +32,18 @@ def step_impl(context):
     """ Delete all Customers and load new ones """
     headers = {'Content-Type': 'application/json'}
     # list all of the customers and delete them one by one
+    # context.resp = requests.get(context.base_url + '/customers', headers=headers)
+    # expect(context.resp.status_code).to_equal(200)
+    # for customer in context.resp.json():
+    #     context.resp = requests.delete(context.base_url + '/customers/' + str(customer["id"]), headers=headers)
+    #     expect(context.resp.status_code).to_equal(204)
+
     context.resp = requests.get(context.base_url + '/customers', headers=headers)
     expect(context.resp.status_code).to_equal(200)
     for customer in context.resp.json():
+        context.resp = requests.get(context.base_url + '/customers/' + str(customer["id"]) + '/addresses', headers=headers)
+        for address in context.resp.json():
+            context.resp = requests.delete(context.base_url + '/customers/' + str(customer["id"]) + '/addresses/' + str(address["id"]))
         context.resp = requests.delete(context.base_url + '/customers/' + str(customer["id"]), headers=headers)
         expect(context.resp.status_code).to_equal(204)
     
