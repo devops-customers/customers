@@ -19,7 +19,7 @@ import json
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
 from service import app, status
-from service.models import db, init_db
+from service.models import db, init_db, Address, Customer
 from .factories import CustomerFactory, AddressFactory
 
 # Disable all but critical errors during normal test run
@@ -60,13 +60,15 @@ class TestCustomerServer(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test"""
-        db.drop_all()  # clean up the last tests
-        db.create_all()  # create new tables
+        # db.drop_all()  # clean up the last tests
+        # db.create_all()  # create new tables
         self.app = app.test_client()
+        db.session.query(Address).delete()
+        db.session.query(Customer).delete()
 
     def tearDown(self):
         db.session.remove()
-        db.drop_all()
+        # db.drop_all()
 
 ######################################################################
 #  H E L P E R   M E T H O D S
