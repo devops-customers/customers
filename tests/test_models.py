@@ -59,13 +59,16 @@ class TestCustomerModel(unittest.TestCase):
 
     def setUp(self):
         """This runs before each test"""
-        db.drop_all()  # clean up the last tests
-        db.create_all()  # make our sqlalchemy tables
+        # db.drop_all()  # clean up the last tests
+        # db.create_all()  # make our sqlalchemy tables
+        db.session.query(Address).delete()
+        db.session.query(Customer).delete()
+        db.session.commit()
 
     def tearDown(self):
         """This runs after each test"""
         db.session.remove()
-        db.drop_all()
+        # db.drop_all()
 
     ######################################################################
     #  H E L P E R   M E T H O D S
@@ -129,7 +132,7 @@ class TestCustomerModel(unittest.TestCase):
         customer = self._create_customer()
         customer.create()
         # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(customer.id, 1)
+        self.assertIsNotNone(customer.id)
         customers = Customer.all()
         self.assertEqual(len(customers), 1)
 
@@ -152,7 +155,7 @@ class TestCustomerModel(unittest.TestCase):
         customer = self._create_customer()
         customer.create()
         # Assert that it was assigned an id and shows in the database
-        self.assertEqual(customer.id, 1)
+        self.assertIsNotNone(customer.id)
 
         # Fetch it back
         customer = Customer.find(customer.id)
@@ -170,7 +173,7 @@ class TestCustomerModel(unittest.TestCase):
         customer = self._create_customer()
         customer.create()
         # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(customer.id, 1)
+        self.assertIsNotNone(customer.id)
         customers = Customer.all()
         self.assertEqual(len(customers), 1)
         customer = customers[0]
@@ -194,11 +197,11 @@ class TestCustomerModel(unittest.TestCase):
         customer = self._create_customer()
         customer.create()
         # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(customer.id, 1)
+        self.assertIsNotNone(customer.id)
 
         # Fetch it back
         customer = Customer.find_or_404(customer.id)
-        self.assertEqual(customer.id, 1)
+        self.assertIsNotNone(customer.id)
 
     def test_find_by_name(self):
         """ Find by username """
@@ -304,7 +307,7 @@ class TestCustomerModel(unittest.TestCase):
         customer.addresses.append(address)
         customer.create()
         # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(customer.id, 1)
+        self.assertIsNotNone(customer.id)
         customers = Customer.all()
         self.assertEqual(len(customers), 1)
 
@@ -328,7 +331,7 @@ class TestCustomerModel(unittest.TestCase):
         customer = self._create_customer(addresses=[address])
         customer.create()
         # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(customer.id, 1)
+        self.assertIsNotNone(customer.id)
         customers = Customer.all()
         self.assertEqual(len(customers), 1)
 
@@ -354,7 +357,7 @@ class TestCustomerModel(unittest.TestCase):
         customer = self._create_customer(addresses=[address])
         customer.create()
         # Assert that it was assigned an id and shows up in the database
-        self.assertEqual(customer.id, 1)
+        self.assertIsNotNone(customer.id)
         customers = Customer.all()
         self.assertEqual(len(customers), 1)
 
