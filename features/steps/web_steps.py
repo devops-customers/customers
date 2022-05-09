@@ -21,6 +21,11 @@ def step_impl(context):
     # Uncomment next line to take a screenshot of the web page
     #context.driver.save_screenshot('home_page.png')
 
+@when('I visit the "Address Page"')
+def step_impl(context):
+    """ Make a call to the address sub-url"""
+    context.driver.get(context.base_url+'/address')
+
 @then('I should see "{message}" in the title')
 def step_impl(context, message):
     """ Check the document title for a message """
@@ -67,6 +72,18 @@ def step_impl(context, element_name):
     )
     context.clipboard = element.get_attribute('value')
     logging.info('Clipboard contains: %s', context.clipboard)
+
+@when('I copy the "ID" field from the results')
+def step_impl(context):
+    value = context.driver.find_element_by_xpath("/html/body/div[@class='container']/div[@id='search_results']/table[@class='table table-striped']/tbody/tr[@id='row_0']/td[1]").text
+    context.clipboard = value
+    logging.info("Clipboard contains: %s", context.clipboard)
+
+@when('I copy the "Customer ID" field from the results')
+def step_impl(context):
+    value = context.driver.find_element_by_xpath("/html/body/div[@class='container']/div[@id='search_results']/table[@class='table table-striped']/tbody/tr[@id='row_0']/td[2]").text
+    context.clipboard = value
+    logging.info("Clipboard contains: %s", context.clipboard)
 
 @when('I paste the "{element_name}" field')
 def step_impl(context, element_name):

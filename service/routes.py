@@ -45,6 +45,13 @@ def index():
     return app.send_static_file("index.html")
 
 ######################################################################
+# CREATE PAGE FOR ADDRESS UI
+######################################################################
+@app.route("/address")
+def address():
+    return app.send_static_file("address.html")
+
+######################################################################
 # Configure Swagger before initializing it
 ######################################################################
 api = Api(app,
