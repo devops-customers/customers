@@ -30,8 +30,10 @@ class CustomerFactory(factory.Factory):
     name = factory.Faker("user_name")
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
+    addresses = []
     email = factory.Faker("email")
     phone_number = factory.Faker("phone_number")
+    account_status = "active"
 
 class AddressFactory(factory.Factory):
     """ Creates fake addresses """

@@ -19,7 +19,7 @@ import json
 # from unittest.mock import MagicMock, patch
 from urllib.parse import quote_plus
 from service import app, status
-from service.models import db, init_db
+from service.models import db, init_db, Address, Customer
 from .factories import CustomerFactory, AddressFactory
 
 # Disable all but critical errors during normal test run
@@ -60,13 +60,15 @@ class TestCustomerServer(unittest.TestCase):
 
     def setUp(self):
         """Runs before each test"""
-        db.drop_all()  # clean up the last tests
-        db.create_all()  # create new tables
+        # db.drop_all()  # clean up the last tests
+        # db.create_all()  # create new tables
         self.app = app.test_client()
+        db.session.query(Address).delete()
+        db.session.query(Customer).delete()
 
     def tearDown(self):
         db.session.remove()
-        db.drop_all()
+        # db.drop_all()
 
 ######################################################################
 #  H E L P E R   M E T H O D S
@@ -99,7 +101,12 @@ class TestCustomerServer(unittest.TestCase):
         #data = resp.get_json()
         #self.assertEqual(data["name"], "Customer Service")
 
+    ######################################################################
+    #  T E S T   C U S T O M E R   R O U T E S
+    ######################################################################
+    # ------------------------------------------------------------------
     # Test create customer account
+    # ------------------------------------------------------------------
     def test_create_a_customer(self):
         """Create a new Customer Account"""
         test_customer = CustomerFactory()
@@ -118,7 +125,9 @@ class TestCustomerServer(unittest.TestCase):
         self.assertEqual(new_customer["email"], test_customer.email, "Email does not match")
         self.assertEqual(new_customer["phone_number"], test_customer.phone_number, "Phone number does not match")
 
-# Check that the location header was correct
+    # ------------------------------------------------------------------
+    #Test create customer account with missing data
+    # ------------------------------------------------------------------
         resp = self.app.get(location, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_customer = resp.get_json()
@@ -265,10 +274,10 @@ class TestCustomerServer(unittest.TestCase):
         for customer in data:
             self.assertEqual(customer["name"], test_name)
 
-    def test_create_customer_no_content_type(self):
-        """Create a customer with no content type"""
-        resp = self.app.post(BASE_URL)
-        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+    # def test_create_customer_no_content_type(self):
+    #     """Create a customer with no content type"""
+    #     resp = self.app.post(BASE_URL)
+    #     self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
 
     # Test delete customer
     def test_delete_customer(self):
